@@ -1,5 +1,9 @@
 # Drinks Drunk UI
 
+## Requirements
+
+- `typescript` version 3.7 or later for [optional chaining](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-7.html)
+
 ## Getting started
 
 1. `npm install`

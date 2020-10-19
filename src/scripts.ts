@@ -99,6 +99,10 @@ class Page {
                 // }),
             },
             options: {
+                title: {
+                    display: true,
+                    text: "Drinks",
+                },
                 scales: {
                     yAxes: [{
                         ticks: {
@@ -153,6 +157,7 @@ class Page {
         }
 
         interface DrinkDranksGroupedByTimestampGroupedByDrinkId {
+            drink?: Drink,
             drinkId: number,
             drinkDranksGroupedByTimestamp: DrinkDranksGroupedByTimestamp[],
         }
@@ -161,6 +166,7 @@ class Page {
 
         for (let drinkGroup of drinkGroups) {
             let group: DrinkDranksGroupedByTimestampGroupedByDrinkId = {
+                drink: drinks.find(drink => drink.id == drinkGroup.drinkId),
                 drinkId: drinkGroup.drinkId,
                 drinkDranksGroupedByTimestamp: [],
             }
@@ -190,15 +196,8 @@ class Page {
             data: {
                 datasets: drinkDranksGroupedByTimestampGroupedByDrinkId.map(group => {
                     let dataset/*: Chart.ChartDataSets*/ = {
-                        label: group.drinkId.toString(),
-                        backgroundColor: () => {
-                            const drink = drinks.find(drink => drink.id == group.drinkId)
-
-                            if (drink)
-                                return drink.colour
-
-                            return null
-                        },
+                        label: group.drink?.name ?? group.drinkId,
+                        backgroundColor: group.drink?.colour,
                         stack: group.drinkId.toString(),
                         data: group.drinkDranksGroupedByTimestamp.map(byTimestamp =>{
                             return {
@@ -227,6 +226,10 @@ class Page {
                 // })
             },
             options: {
+                title: {
+                    display: true,
+                    text: "Drink Dranks",
+                },
                 scales: {
                     xAxes: [{
                         type: 'time',
