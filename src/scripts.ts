@@ -4,10 +4,11 @@
 // import { Chart } from "../node_modules/chart.js/dist/Chart.bundle.js"
 
 function onlyUnique(value, index, self) {
-  return self.indexOf(value) === index;
+  return self.indexOf(value) === index
 }
 
 interface DrinkDrank {
+    id: number,
     drinkId: number
     timestamp: Date
 }
@@ -44,6 +45,7 @@ class DrinksDrunkApi {
 
         for (let i = 0; i < 7; i++) {
             data.push({
+                id: data.length,
                 drinkId: 1,
                 timestamp: new Date(date.setHours(getRandomInt(7, 12)))
             })
@@ -51,6 +53,7 @@ class DrinksDrunkApi {
 
         for (let i = 0; i < 20; i++) {
             data.push({
+                id: data.length,
                 drinkId: getRandomInt(1, 5),
                 timestamp: new Date(date.setHours(getRandomInt(12, 18)))
             })
@@ -61,9 +64,7 @@ class DrinksDrunkApi {
                 .filter(x => x.drinkId == drinkId)
         }
 
-        console.log(data)
-
-        return data;
+        return data
     }
 }
 
@@ -134,7 +135,7 @@ class Page {
                     drinkDranks: [],
                 }
 
-                return drinkGroup;
+                return drinkGroup
             })
 
         for (let drinkDrank of drinkDranks) {
@@ -164,7 +165,7 @@ class Page {
                 drinkDranksGroupedByTimestamp: [],
             }
 
-            for (let drinkDrank of drinkGroup.drinkDranks) {
+            for (let drinkDrank of drinkGroup.drinkDranks.sort((drinkDrankA, drinkDrankB) => drinkDrankA.timestamp.getTime() - drinkDrankB.timestamp.getTime())) {
                 let byTimestamp = group.drinkDranksGroupedByTimestamp.find(x => x.timestamp.getTime() == drinkDrank.timestamp.getTime())
 
                 if (byTimestamp) {
@@ -174,13 +175,15 @@ class Page {
                         timestamp: drinkDrank.timestamp,
                         drinkDranks: [ drinkDrank ]
                     }
-                }
 
-                group.drinkDranksGroupedByTimestamp.push(byTimestamp)
+                    group.drinkDranksGroupedByTimestamp.push(byTimestamp)
+                }
             }
 
             drinkDranksGroupedByTimestampGroupedByDrinkId.push(group)
         }
+
+        console.log(drinkDranksGroupedByTimestampGroupedByDrinkId)
 
         new Chart(ctx, {
             type: 'bar',
