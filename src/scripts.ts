@@ -31,27 +31,7 @@ class DrinksDrunkApi {
             console.error(reason)
         })
 
-        return drinks.map((drink, index) => {
-            switch (index) {
-                case 1:
-                    drink.colour = 'blue'
-                    break;
-                case 2:
-                    drink.colour = 'red'
-                    break;
-                case 3:
-                    drink.colour = 'green'
-                    break;
-                case 4:
-                    drink.colour = 'purple'
-                    break;
-                case 5:
-                    drink.colour = 'black'
-                    break;
-            }
-
-            return drink
-        })
+        return drinks
     }
     async drinkDranks(drinkId?: number): Promise<DrinkDrank[]> {
         function getRandomInt(min: number, max: number): number {
@@ -102,10 +82,20 @@ class Page {
             data: {
                 labels: drinks.map(drink => drink.name),
                 datasets: [{
-                    label: 'Drink that were drank',
+                    label: 'Drink that were drunk',
                     data: drinks.map(drink => drink.count),
-                    borderWidth: 1
+                    borderWidth: 1,
+                    backgroundColor: drinks.map(drink => drink.colour),
                 }]
+                // datasets: drinks.map(drink => {
+                //     let dataset/*: Chart.ChartDataSets*/ = {
+                //         label: drink.name.toString(),
+                //         backgroundColor: drink.colour,
+                //         data: [drink.count],
+                //     }
+
+                //     return dataset
+                // }),
             },
             options: {
                 scales: {
