@@ -195,8 +195,8 @@ class Page {
             type: 'bar',
             data: {
                 datasets: drinkDranksGroupedByTimestampGroupedByDrinkId.map(group => {
-                    let dataset/*: Chart.ChartDataSets*/ = {
-                        label: group.drink?.name ?? group.drinkId,
+                    let dataset: Chart.ChartDataSets = {
+                        label: group.drink?.name ?? group.drinkId.toString(),
                         backgroundColor: group.drink?.colour,
                         stack: group.drinkId.toString(),
                         data: group.drinkDranksGroupedByTimestamp.map(byTimestamp =>{
