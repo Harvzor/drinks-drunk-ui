@@ -1,16 +1,41 @@
 // import Chart from 'chart.js'
 // import _ from 'lodash'
 
-// import { Chart } from "../node_modules/chart.js/dist/Chart.bundle.js"
+import luxon from "luxon"
+import { Chart } from "../node_modules/chart.js/dist/Chart.bundle.js"
 
 function onlyUnique(value, index, self) {
   return self.indexOf(value) === index
 }
 
-interface DrinkDrank {
-    id: number,
-    drinkId: number
-    timestamp: Date
+class DrinkDrankDto {
+    id: number
+    drink_id: number
+    drank_timestamp: string
+}
+
+class DrinkDrank extends DrinkDrankDto {
+    static fromDrinkDrankDto(dto: DrinkDrankDto): DrinkDrank {
+        let drinkDrank = new DrinkDrank()
+        
+        drinkDrank.id = dto.id
+        drinkDrank.drink_id = dto.drink_id
+        drinkDrank.drank_timestamp = dto.drank_timestamp
+
+        return drinkDrank
+    }
+    drank_timestamp_datetime() {
+        return luxon.DateTime.fromISO(this.drank_timestamp)
+    }
+    drank_timestamp_date() {
+        let dateTime = this.drank_timestamp_datetime() 
+
+        dateTime.minute = 0;
+        dateTime.second = 0;
+        dateTime.millisecond = 0;
+
+        return dateTime
+    }
 }
 
 interface Drink {
@@ -35,36 +60,16 @@ class DrinksDrunkApi {
         return drinks
     }
     async drinkDranks(drinkId?: number): Promise<DrinkDrank[]> {
-        function getRandomInt(min: number, max: number): number {
-            return Math.floor(Math.random() * (max - min + 1) + min)
-        }
+        const drinkDrankDtos: DrinkDrankDto[] = await fetch(this._domain + "/drink_dranks", {
+            mode: 'cors'
+        })
+        .then(res => res.json())
+        .catch((reason) => {
+            console.error(reason)
+        })
 
-        const date = new Date()
-
-        let data: DrinkDrank[] = []
-
-        for (let i = 0; i < 7; i++) {
-            data.push({
-                id: data.length,
-                drinkId: 1,
-                timestamp: new Date(date.setHours(getRandomInt(7, 12)))
-            })
-        }
-
-        for (let i = 0; i < 20; i++) {
-            data.push({
-                id: data.length,
-                drinkId: getRandomInt(1, 5),
-                timestamp: new Date(date.setHours(getRandomInt(12, 18)))
-            })
-        }
-
-        if (drinkId != null) {
-            data = data
-                .filter(x => x.drinkId == drinkId)
-        }
-
-        return data
+        return drinkDrankDtos
+            .map(dto => DrinkDrank.fromDrinkDrankDto(dto))
     }
 }
 
@@ -119,19 +124,13 @@ class Page {
         const drinkDranks = await this._drinkDrunkApi.drinkDranks()
         const drinks = await this._drinkDrunkApi.list()
 
-
-        drinkDranks.forEach(drinkDrank => {
-            drinkDrank.timestamp.setMinutes(0)
-            drinkDrank.timestamp.setSeconds(0)
-        })
-
         interface DrinkGroup {
             drinkId: number,
             drinkDranks: DrinkDrank[],
         }
 
         let drinkGroups: DrinkGroup[] = drinkDranks
-            .map(x => x.drinkId)
+            .map(x => x.drink_id)
             .filter(onlyUnique)
             .map(x => {
                 let drinkGroup: DrinkGroup = {
@@ -143,7 +142,7 @@ class Page {
             })
 
         for (let drinkDrank of drinkDranks) {
-            let drinkGroup = drinkGroups.find(drinkGroup => drinkGroup.drinkId == drinkDrank.drinkId)
+            let drinkGroup = drinkGroups.find(drinkGroup => drinkGroup.drinkId == drinkDrank.drink_id)
 
             drinkGroup.drinkDranks.push(drinkDrank)
         }
@@ -152,7 +151,7 @@ class Page {
             .sort((drinkGroupA, drinkGroupB) => drinkGroupA.drinkId - drinkGroupB.drinkId)
 
         interface DrinkDranksGroupedByTimestamp {
-            timestamp: Date,
+            timestamp: luxon.DateTime,
             drinkDranks: DrinkDrank[],
         }
 
@@ -171,14 +170,19 @@ class Page {
                 drinkDranksGroupedByTimestamp: [],
             }
 
-            for (let drinkDrank of drinkGroup.drinkDranks.sort((drinkDrankA, drinkDrankB) => drinkDrankA.timestamp.getTime() - drinkDrankB.timestamp.getTime())) {
-                let byTimestamp = group.drinkDranksGroupedByTimestamp.find(x => x.timestamp.getTime() == drinkDrank.timestamp.getTime())
+            for (let drinkDrank of drinkGroup.drinkDranks
+                .sort((drinkDrankA, drinkDrankB) =>
+                    drinkDrankA.drank_timestamp_date().diff(drinkDrankB.drank_timestamp_date()).milliseconds
+                )
+            ) {
+                let byTimestamp = group.drinkDranksGroupedByTimestamp
+                    .find(x => x.timestamp.equals(drinkDrank.drank_timestamp_date()))
 
                 if (byTimestamp) {
                     byTimestamp.drinkDranks.push(drinkDrank)
                 } else {
                     byTimestamp = {
-                        timestamp: drinkDrank.timestamp,
+                        timestamp: drinkDrank.drank_timestamp_date(),
                         drinkDranks: [ drinkDrank ]
                     }
 
