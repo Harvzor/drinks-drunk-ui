@@ -30,11 +30,7 @@ class DrinkDrank extends DrinkDrankDto {
     drank_timestamp_date() {
         let dateTime = this.drank_timestamp_datetime() 
 
-        dateTime.minute = 0;
-        dateTime.second = 0;
-        dateTime.millisecond = 0;
-
-        return dateTime
+        return luxon.DateTime.local(dateTime.year, dateTime.month, dateTime.day, dateTime.hour)
     }
 }
 
