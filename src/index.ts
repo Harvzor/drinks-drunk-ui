@@ -1,8 +1,8 @@
 // import Chart from 'chart.js'
 // import _ from 'lodash'
 
-import luxon from "luxon"
-import { Chart } from "../node_modules/chart.js/dist/Chart.bundle.js"
+import * as luxon from "luxon"
+import * as Chart from "chart.js"
 
 function onlyUnique(value, index, self) {
   return self.indexOf(value) === index
@@ -47,7 +47,7 @@ interface Drink {
 }
 
 class DrinksDrunkApi {
-    private _domain = 'http://localhost:8000'
+    private _domain = 'http://localhost:9999'
     async list(): Promise<Drink[]> {
         const drinks: Drink[] = await fetch(this._domain + "/drinks", {
             mode: 'cors'
@@ -199,20 +199,18 @@ class Page {
             type: 'bar',
             data: {
                 datasets: drinkDranksGroupedByTimestampGroupedByDrinkId.map(group => {
-                    let dataset: Chart.ChartDataSets = {
+                    return {
                         label: group.drink?.name ?? group.drinkId.toString(),
                         backgroundColor: group.drink?.colour,
                         stack: group.drinkId.toString(),
-                        data: group.drinkDranksGroupedByTimestamp.map(byTimestamp =>{
+                        data: group.drinkDranksGroupedByTimestamp.map(byTimestamp => {
                             return {
-                                x: byTimestamp.timestamp,
+                                x: byTimestamp.timestamp.toString(),
                                 y: byTimestamp.drinkDranks.length,
                             }
-                        })
+                        }) as Chart.ChartPoint[]
                     }
-
-                    return dataset
-                })
+                }) as Chart.ChartDataSets[]
 
                 // labels: timestampCounts.map(x => x.drinkId),
                 // datasets: drinkGroups.map(drinkGroup => {

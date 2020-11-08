@@ -1,12 +1,10 @@
 {
   "compilerOptions": {
-    "target": "ES2015",
+    "outDir": "./dist/",
+    "sourceMap": true,
+    // "noImplicitAny": true,
     "module": "commonjs",
-    "strict": false,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
-  },
-  "$schema": "https://json.schemastore.org/tsconfig",
-  "display": "Recommended"
+    "target": "es5",
+    "allowJs": true
+  }
 }
