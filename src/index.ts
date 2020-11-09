@@ -44,7 +44,7 @@ interface Drink {
 
 class DrinksDrunkApi {
     private _domain = 'http://localhost:9999'
-    async list(): Promise<Drink[]> {
+    async listDrinks(): Promise<Drink[]> {
         const drinks: Drink[] = await fetch(this._domain + "/drinks", {
             mode: 'cors'
         })
@@ -55,7 +55,7 @@ class DrinksDrunkApi {
 
         return drinks
     }
-    async drinkDranks(drinkId?: number): Promise<DrinkDrank[]> {
+    async listDrinkDranks(drinkId?: number): Promise<DrinkDrank[]> {
         const drinkDrankDtos: DrinkDrankDto[] = await fetch(this._domain + "/drink_dranks", {
             mode: 'cors'
         })
@@ -67,17 +67,36 @@ class DrinksDrunkApi {
         return drinkDrankDtos
             .map(dto => DrinkDrank.fromDrinkDrankDto(dto))
     }
+    async incrementDrink(drinkId: number): Promise<DrinkDrank> {
+        const drinkDrankDto: DrinkDrankDto = await fetch(this._domain + "/drink_dranks", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json;charset=utf-8'
+            },
+            body: JSON.stringify({
+                drink_id: drinkId,
+            }),
+            mode: 'cors'
+        })
+        .then(res => res.json())
+        .catch((reason) => {
+            console.error(reason)
+        })
+
+        return DrinkDrank.fromDrinkDrankDto(drinkDrankDto)
+    }
 }
 
 class Page {
     private _drinkDrunkApi = new DrinksDrunkApi()
     async build() {
-        this.allDrinks()
-        this.drinkDranks()
+        this.allDrinksChart()
+        this.drinkDranksChart()
+        this.incrementDrinkForm()
     }
-    async allDrinks() {
+    async allDrinksChart() {
         const ctx: any = document.getElementById('all-drinks')
-        const drinks = await this._drinkDrunkApi.list()
+        const drinks = await this._drinkDrunkApi.listDrinks()
 
         new Chart(ctx, {
             type: 'bar',
@@ -115,10 +134,10 @@ class Page {
             }
         })
     }
-    async drinkDranks() {
+    async drinkDranksChart() {
         const ctx: any = document.getElementById('drink-dranks')
-        const drinkDranks = await this._drinkDrunkApi.drinkDranks()
-        const drinks = await this._drinkDrunkApi.list()
+        const drinkDranks = await this._drinkDrunkApi.listDrinkDranks()
+        const drinks = await this._drinkDrunkApi.listDrinks()
 
         interface DrinkGroup {
             drinkId: number,
@@ -189,8 +208,6 @@ class Page {
             drinkDranksGroupedByTimestampGroupedByDrinkId.push(group)
         }
 
-        console.log(drinkDranksGroupedByTimestampGroupedByDrinkId)
-
         new Chart(ctx, {
             type: 'bar',
             data: {
@@ -251,6 +268,21 @@ class Page {
                     }]
                 }
             }
+        })
+    }
+    async incrementDrinkForm() {
+        const form = document.getElementById('increment-drink-form') as HTMLFormElement
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault()
+
+            const formData = new FormData(form)
+
+            const drinkId = parseInt(formData.get('drinkId').toString())
+
+            console.log(drinkId)
+
+            this._drinkDrunkApi.incrementDrink(drinkId)
         })
     }
 }

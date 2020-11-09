@@ -8,8 +8,18 @@
 <body>
     <div class="container">
         <h1>Drinks Drunk</h1>
+        <h2>Everything with counts</h2>
         <canvas id="all-drinks"></canvas>
+        <h2>Occurences in the last week</h2>
         <canvas id="drink-dranks"></canvas>
+        <h2>Increment drink</h2>
+        <form id="increment-drink-form">
+            <label>
+                Drink ID:
+                <input type="number" name="drinkId">
+            </label>
+            <button>Submit</button>
+        </form>
         <script src="/node_modules/luxon/build/global/luxon.js"></script>
         <script src="/node_modules/chart.js/dist/Chart.bundle.js"></script>
         <script type="module" src="/dist/bundle.js"></script>
