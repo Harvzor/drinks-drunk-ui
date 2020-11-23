@@ -43,7 +43,7 @@ interface Drink {
 }
 
 class DrinksDrunkApi {
-    private _domain = 'http://localhost:9999'
+    private _domain = 'http://localhost:8000'
     async listDrinks(): Promise<Drink[]> {
         const drinks: Drink[] = await fetch(this._domain + "/drinks", {
             mode: 'cors'
