@@ -1,104 +1,23 @@
-// import Chart from 'chart.js'
-// import _ from 'lodash'
+import React from 'react';
+import ReactDOM from 'react-dom';
 
 import * as luxon from "luxon"
-import * as Chart from "chart.js"
+import * as ChartJs from "chart.js"
+
+import { Api, Drink, DrinkDrank, DrinkDrankDto } from "./api"
 
 function onlyUnique(value, index, self) {
-  return self.indexOf(value) === index
+    return self.indexOf(value) === index
 }
 
-class DrinkDrankDto {
-    id: number
-    drink_id: number
-    drank_timestamp: string
-}
+export class AllItemsChart extends React.Component {
+    async renderChart() {
+        const api  = new Api()
 
-class DrinkDrank extends DrinkDrankDto {
-    static fromDrinkDrankDto(dto: DrinkDrankDto): DrinkDrank {
-        let drinkDrank = new DrinkDrank()
-        
-        drinkDrank.id = dto.id
-        drinkDrank.drink_id = dto.drink_id
-        drinkDrank.drank_timestamp = dto.drank_timestamp
+        const ctx: any = document.getElementById('all-items')
+        const drinks = await api.listDrinks()
 
-        return drinkDrank
-    }
-    drank_timestamp_datetime() {
-        return luxon.DateTime.fromISO(this.drank_timestamp)
-    }
-    drank_timestamp_date() {
-        let dateTime = this.drank_timestamp_datetime() 
-
-        return luxon.DateTime.local(dateTime.year, dateTime.month, dateTime.day, dateTime.hour)
-    }
-}
-
-interface Drink {
-    id: number
-    name: string
-    count: number
-    deleted: boolean
-    colour: string
-}
-
-class DrinksDrunkApi {
-    private _domain = 'http://localhost:8000'
-    async listDrinks(): Promise<Drink[]> {
-        const drinks: Drink[] = await fetch(this._domain + "/drinks", {
-            mode: 'cors'
-        })
-        .then(res => res.json())
-        .catch((reason) => {
-            console.error(reason)
-        })
-
-        return drinks
-    }
-    async listDrinkDranks(drinkId?: number): Promise<DrinkDrank[]> {
-        const drinkDrankDtos: DrinkDrankDto[] = await fetch(this._domain + "/drink_dranks", {
-            mode: 'cors'
-        })
-        .then(res => res.json())
-        .catch((reason) => {
-            console.error(reason)
-        })
-
-        return drinkDrankDtos
-            .map(dto => DrinkDrank.fromDrinkDrankDto(dto))
-    }
-    async incrementDrink(drinkId: number): Promise<DrinkDrank> {
-        const drinkDrankDto: DrinkDrankDto = await fetch(this._domain + "/drink_dranks", {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json;charset=utf-8'
-            },
-            body: JSON.stringify({
-                drink_id: drinkId,
-            }),
-            mode: 'cors'
-        })
-        .then(res => res.json())
-        .catch((reason) => {
-            console.error(reason)
-        })
-
-        return DrinkDrank.fromDrinkDrankDto(drinkDrankDto)
-    }
-}
-
-class Page {
-    private _drinkDrunkApi = new DrinksDrunkApi()
-    async build() {
-        this.allDrinksChart()
-        this.drinkDranksChart()
-        this.incrementDrinkForm()
-    }
-    async allDrinksChart() {
-        const ctx: any = document.getElementById('all-drinks')
-        const drinks = await this._drinkDrunkApi.listDrinks()
-
-        new Chart(ctx, {
+        new ChartJs.Chart(ctx, {
             type: 'bar',
             data: {
                 labels: drinks.map(drink => drink.name),
@@ -134,10 +53,25 @@ class Page {
             }
         })
     }
+    componentDidMount() {
+        this.renderChart()
+    }
+    render() {
+        return (
+            <canvas id="all-items"></canvas>
+        )
+    }
+}
+
+export class Charts {
+    private _api = new Api()
+    async build() {
+        this.drinkDranksChart()
+    }
     async drinkDranksChart() {
         const ctx: any = document.getElementById('drink-dranks')
-        const drinkDranks = await this._drinkDrunkApi.listDrinkDranks()
-        const drinks = await this._drinkDrunkApi.listDrinks()
+        const drinkDranks = await this._api.listDrinkDranks()
+        const drinks = await this._api.listDrinks()
 
         interface DrinkGroup {
             drinkId: number,
@@ -208,7 +142,7 @@ class Page {
             drinkDranksGroupedByTimestampGroupedByDrinkId.push(group)
         }
 
-        new Chart(ctx, {
+        new ChartJs.Chart(ctx, {
             type: 'bar',
             data: {
                 datasets: drinkDranksGroupedByTimestampGroupedByDrinkId.map(group => {
@@ -221,9 +155,9 @@ class Page {
                                 x: byTimestamp.timestamp.toString(),
                                 y: byTimestamp.drinkDranks.length,
                             }
-                        }) as Chart.ChartPoint[]
+                        }) as ChartJs.ChartPoint[]
                     }
-                }) as Chart.ChartDataSets[]
+                }) as ChartJs.ChartDataSets[]
 
                 // labels: timestampCounts.map(x => x.drinkId),
                 // datasets: drinkGroups.map(drinkGroup => {
@@ -270,22 +204,4 @@ class Page {
             }
         })
     }
-    async incrementDrinkForm() {
-        const form = document.getElementById('increment-drink-form') as HTMLFormElement
-
-        form.addEventListener('submit', (e) => {
-            e.preventDefault()
-
-            const formData = new FormData(form)
-
-            const drinkId = parseInt(formData.get('drinkId').toString())
-
-            console.log(drinkId)
-
-            this._drinkDrunkApi.incrementDrink(drinkId)
-        })
-    }
 }
-
-new Page()
-    .build()
