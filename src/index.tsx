@@ -23,7 +23,7 @@ import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import InboxIcon from '@material-ui/icons/MoveToInbox';
 import MailIcon from '@material-ui/icons/Mail';
 
-import { AllItemsChart, HourlyScrobbles } from './charts';
+import { AllItemsChart, HourlyScrobbles, DailyScrobbles } from './charts';
 
 function App() {
     const [open, setOpen] = React.useState(false);
@@ -74,10 +74,7 @@ function App() {
                     <h1>Life Scrobbler</h1>
                     <AllItemsChart/>
                     <HourlyScrobbles />
-                    {/* <canvas id="drink-dranks"></canvas> */}
-                    <Button variant="contained" color="primary">
-                        Hello World
-                    </Button>
+                    <DailyScrobbles />
                 </Container>
             </main>
         </React.Fragment>

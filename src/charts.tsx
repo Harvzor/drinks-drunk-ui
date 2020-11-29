@@ -181,26 +181,11 @@ export class HourlyScrobbles extends React.Component {
                         }) as ChartJs.ChartPoint[]
                     }
                 }) as ChartJs.ChartDataSets[]
-
-                // labels: timestampCounts.map(x => x.drinkId),
-                // datasets: drinkGroups.map(drinkGroup => {
-                //     let dataset/*: Chart.ChartDataSets*/ = {
-                //         label: drinkGroup.drinkId.toString(),
-                //         data: drinkGroup.drinkDranks.map(drinkDrank =>{
-                //             return {
-                //                 x: drinkDrank.timestamp,
-                //                 y: 1
-                //             }
-                //         })
-                //     }
-
-                //     return dataset
-                // })
             },
             options: {
                 title: {
                     display: true,
-                    text: "Hourly view of Scrobbles (last 3 days)",
+                    text: "Hourly view of scrobbles (last 3 days)",
                 },
                 scales: {
                     xAxes: [{
@@ -235,6 +220,75 @@ export class HourlyScrobbles extends React.Component {
     render() {
         return (
             <canvas id="hourly-scrobbles"></canvas>
+        )
+    }
+}
+
+export class DailyScrobbles extends React.Component {
+    async renderChart() {
+        const api = new Api()
+
+        const ctx: any = document.getElementById('daily-scrobbles')
+        const drinkDranks = await api.listDrinkDranks()
+        const drinks = await api.listDrinks()
+
+        const scrobblesGroupedByTimestampGroupedByDrinkId = groupScrobblesByTimeStampAndItemId(drinkDranks, drinks, 'day')
+
+        new ChartJs.Chart(ctx, {
+            type: 'bar',
+            data: {
+                datasets: scrobblesGroupedByTimestampGroupedByDrinkId.map(group => {
+                    return {
+                        label: group.item?.name ?? group.itemId.toString(),
+                        backgroundColor: group.item?.colour,
+                        stack: group.itemId.toString(),
+                        data: group.scrobblesGroupedByTimestamp.map(byTimestamp => {
+                            return {
+                                x: byTimestamp.timestamp.toString(),
+                                y: byTimestamp.scrobbles.length,
+                            }
+                        }) as ChartJs.ChartPoint[]
+                    }
+                }) as ChartJs.ChartDataSets[]
+            },
+            options: {
+                title: {
+                    display: true,
+                    text: "Daily view of scrobbles (last 30 days)",
+                },
+                scales: {
+                    xAxes: [{
+                        type: 'time',
+                        // distribution: 'series',
+                        // offset: true,
+                        // stacked: true,
+                        time: {
+                            unit: 'day',
+                        },
+                        ticks: {
+                            min: luxon.DateTime.local().plus({ days: -30 }).toISO(),
+                            max: luxon.DateTime.local().toString(),
+                            // beginAtZero: true,
+                            stepSize: 1,
+                        }
+                    }],
+                    yAxes: [{
+                        // stacked: true,
+                        ticks: {
+                            beginAtZero: true,
+                            stepSize: 1,
+                        }
+                    }]
+                }
+            }
+        })
+    }
+    componentDidMount() {
+        this.renderChart()
+    }
+    render() {
+        return (
+            <canvas id="daily-scrobbles"></canvas>
         )
     }
 }
