@@ -22,7 +22,7 @@ export class AllItemsChart extends React.Component {
             data: {
                 labels: drinks.map(drink => drink.name),
                 datasets: [{
-                    label: 'Drink that were drunk',
+                    label: 'Items',
                     data: drinks.map(drink => drink.count),
                     borderWidth: 1,
                     backgroundColor: drinks.map(drink => drink.colour),
@@ -38,10 +38,10 @@ export class AllItemsChart extends React.Component {
                 // }),
             },
             options: {
-                title: {
-                    display: true,
-                    text: "Drinks",
-                },
+                // title: {
+                //     display: true,
+                //     text: "Items",
+                // },
                 scales: {
                     yAxes: [{
                         ticks: {
@@ -79,7 +79,7 @@ interface ScrobblesGroupedByTimestampGroupedByItemId {
     scrobblesGroupedByTimestamp: ScrobblesGroupedByTimestamp[],
 }
 
-const groupDrinkDranksByItems = (scrobbles: DrinkDrank[], items: Drink[]): ItemGroup[] => {
+const groupScrobblesByItems = (scrobbles: DrinkDrank[], items: Drink[]): ItemGroup[] => {
     // Create the groups to be populated.
     let itemGroups: ItemGroup[] = scrobbles
         .map(x => x.drink_id)
@@ -107,10 +107,10 @@ const groupDrinkDranksByItems = (scrobbles: DrinkDrank[], items: Drink[]): ItemG
     return itemGroups
 }
 
-const groupDrinkDranksByTimeStampAndDrinkId = (scrobbles: DrinkDrank[], items: Drink[]): ScrobblesGroupedByTimestampGroupedByItemId[] => {
-    const itemGroups = groupDrinkDranksByItems(scrobbles, items)
+const groupScrobblesByTimeStampAndItemId = (scrobbles: DrinkDrank[], items: Drink[], roundTo: luxon.DurationUnit): ScrobblesGroupedByTimestampGroupedByItemId[] => {
+    const itemGroups = groupScrobblesByItems(scrobbles, items)
 
-    let dcrobblesGroupedByTimestampGroupedByItemId: ScrobblesGroupedByTimestampGroupedByItemId[] = []
+    let scrobblesGroupedByTimestampGroupedByItemId: ScrobblesGroupedByTimestampGroupedByItemId[] = []
 
     for (let itemGroup of itemGroups) {
         let group: ScrobblesGroupedByTimestampGroupedByItemId = {
@@ -119,46 +119,56 @@ const groupDrinkDranksByTimeStampAndDrinkId = (scrobbles: DrinkDrank[], items: D
             scrobblesGroupedByTimestamp: [],
         }
 
-        for (let drinkDrank of itemGroup.scrobbles
+        for (let scrobble of itemGroup.scrobbles
             .sort((drinkDrankA, drinkDrankB) =>
-                drinkDrankA.drank_timestamp_date().diff(drinkDrankB.drank_timestamp_date()).milliseconds
+                drinkDrankA.drank_timestamp_datetime().diff(drinkDrankB.drank_timestamp_datetime()).milliseconds
             )
         ) {
             let byTimestamp = group.scrobblesGroupedByTimestamp
-                .find(x => x.timestamp.equals(drinkDrank.drank_timestamp_date()))
+                .find(x => x.timestamp.hasSame(scrobble.drank_timestamp_datetime(), roundTo))
 
             if (byTimestamp) {
-                byTimestamp.scrobbles.push(drinkDrank)
+                byTimestamp.scrobbles.push(scrobble)
             } else {
+                let t = scrobble.drank_timestamp_datetime()
+
+                if (roundTo === "hour") {
+                    t = t.plus({ minutes: -t.minute, seconds: -t.second, milliseconds: -t.millisecond })
+                } else if (roundTo === 'day') {
+                    t = t.plus({ hours: -t.hour, minutes: -t.minute, seconds: -t.second, milliseconds: -t.millisecond })
+                } else {
+                    throw "Unhandled duration unit."
+                }
+
                 byTimestamp = {
-                    timestamp: drinkDrank.drank_timestamp_date(),
-                    scrobbles: [ drinkDrank ]
+                    timestamp: t,
+                    scrobbles: [ scrobble ]
                 }
 
                 group.scrobblesGroupedByTimestamp.push(byTimestamp)
             }
         }
 
-        dcrobblesGroupedByTimestampGroupedByItemId.push(group)
+        scrobblesGroupedByTimestampGroupedByItemId.push(group)
     }
 
-    return dcrobblesGroupedByTimestampGroupedByItemId
+    return scrobblesGroupedByTimestampGroupedByItemId
 }
 
-export class WeeklyScrobbles extends React.Component {
+export class HourlyScrobbles extends React.Component {
     async renderChart() {
         const api = new Api()
 
-        const ctx: any = document.getElementById('weekly-scrobbles')
+        const ctx: any = document.getElementById('hourly-scrobbles')
         const drinkDranks = await api.listDrinkDranks()
         const drinks = await api.listDrinks()
 
-        const drinkDranksGroupedByTimestampGroupedByDrinkId = groupDrinkDranksByTimeStampAndDrinkId(drinkDranks, drinks)
+        const scrobblesGroupedByTimestampGroupedByDrinkId = groupScrobblesByTimeStampAndItemId(drinkDranks, drinks, 'hour')
 
         new ChartJs.Chart(ctx, {
             type: 'bar',
             data: {
-                datasets: drinkDranksGroupedByTimestampGroupedByDrinkId.map(group => {
+                datasets: scrobblesGroupedByTimestampGroupedByDrinkId.map(group => {
                     return {
                         label: group.item?.name ?? group.itemId.toString(),
                         backgroundColor: group.item?.colour,
@@ -190,7 +200,7 @@ export class WeeklyScrobbles extends React.Component {
             options: {
                 title: {
                     display: true,
-                    text: "Drink Dranks",
+                    text: "Hourly view of Scrobbles (last 3 days)",
                 },
                 scales: {
                     xAxes: [{
@@ -202,6 +212,8 @@ export class WeeklyScrobbles extends React.Component {
                             unit: 'hour'
                         },
                         ticks: {
+                            min: luxon.DateTime.local().plus({ days: -3 }).toISO(),
+                            max: luxon.DateTime.local().toString(),
                             // beginAtZero: true,
                             stepSize: 1,
                         }
@@ -222,7 +234,7 @@ export class WeeklyScrobbles extends React.Component {
     }
     render() {
         return (
-            <canvas id="weekly-scrobbles"></canvas>
+            <canvas id="hourly-scrobbles"></canvas>
         )
     }
 }

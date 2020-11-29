@@ -19,11 +19,11 @@ export class DrinkDrank extends DrinkDrankDto {
     drank_timestamp_datetime() {
         return luxon.DateTime.fromISO(this.drank_timestamp)
     }
-    drank_timestamp_date() {
-        let dateTime = this.drank_timestamp_datetime() 
+    // drank_timestamp_date() {
+    //     let dateTime = this.drank_timestamp_datetime() 
 
-        return luxon.DateTime.local(dateTime.year, dateTime.month, dateTime.day, dateTime.hour)
-    }
+    //     return luxon.DateTime.local(dateTime.year, dateTime.month, dateTime.day, dateTime.hour)
+    // }
 }
 
 export interface Drink {
@@ -48,51 +48,13 @@ export class Api {
         return drinks
     }
     async listDrinkDranks(drinkId?: number): Promise<DrinkDrank[]> {
-        // const drinkDrankDtos: DrinkDrankDto[] = await fetch(this._domain + "/drink_dranks", {
-        //     mode: 'cors'
-        // })
-        // .then(res => res.json())
-        // .catch((reason) => {
-        //     console.error(reason)
-        // })
-
-        const drinkDrankDtos: DrinkDrankDto[] = [
-            {
-                "id": 1,
-                "drink_id": 2,
-                "drank_timestamp": "2020-12-01T12:50:25.960458"
-            },
-            {
-                "id": 1,
-                "drink_id": 2,
-                "drank_timestamp": "2020-12-01T14:10:25.960458"
-            },
-            {
-                "id": 1,
-                "drink_id": 2,
-                "drank_timestamp": "2020-12-01T18:01:25.960458"
-            },
-            {
-                "id": 1,
-                "drink_id": 3,
-                "drank_timestamp": "2020-12-01T09:59:25.960458"
-            },
-            {
-                "id": 1,
-                "drink_id": 3,
-                "drank_timestamp": "2020-12-02T15:14:25.960458"
-            },
-            {
-                "id": 1,
-                "drink_id": 3,
-                "drank_timestamp": "2020-12-03T20:11:25.960458"
-            },
-            {
-                "id": 1,
-                "drink_id": 4,
-                "drank_timestamp": "2020-12-02T13:19:25.960458"
-            },
-        ]
+        const drinkDrankDtos: DrinkDrankDto[] = await fetch(this._domain + "/drink_dranks", {
+            mode: 'cors'
+        })
+        .then(res => res.json())
+        .catch((reason) => {
+            console.error(reason)
+        })
 
         return drinkDrankDtos
             .map(dto => DrinkDrank.fromDrinkDrankDto(dto))
