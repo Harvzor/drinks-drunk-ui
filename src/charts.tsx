@@ -63,6 +63,88 @@ export class AllItemsChart extends React.Component {
     }
 }
 
+interface ItemGroup {
+    itemId: number,
+    scrobbles: DrinkDrank[],
+}
+
+interface ScrobblesGroupedByTimestamp {
+    timestamp: luxon.DateTime,
+    scrobbles: DrinkDrank[],
+}
+
+interface ScrobblesGroupedByTimestampGroupedByItemId {
+    item?: Drink,
+    itemId: number,
+    scrobblesGroupedByTimestamp: ScrobblesGroupedByTimestamp[],
+}
+
+const groupDrinkDranksByItems = (scrobbles: DrinkDrank[], items: Drink[]): ItemGroup[] => {
+    // Create the groups to be populated.
+    let itemGroups: ItemGroup[] = scrobbles
+        .map(x => x.drink_id)
+        .filter(onlyUnique)
+        .map(x => {
+            let itemGroup: ItemGroup = {
+                itemId: x,
+                scrobbles: [],
+            }
+
+            return itemGroup
+        })
+
+    // Populate the groups with scrobbles.
+    for (let drinkDrank of scrobbles) {
+        let itemGroup = itemGroups.find(drinkGroup => drinkGroup.itemId == drinkDrank.drink_id)
+
+        itemGroup.scrobbles.push(drinkDrank)
+    }
+
+    // Sort the items in number order of the item IDs.
+    itemGroups = itemGroups
+        .sort((drinkGroupA, drinkGroupB) => drinkGroupA.itemId - drinkGroupB.itemId)
+
+    return itemGroups
+}
+
+const groupDrinkDranksByTimeStampAndDrinkId = (scrobbles: DrinkDrank[], items: Drink[]): ScrobblesGroupedByTimestampGroupedByItemId[] => {
+    const itemGroups = groupDrinkDranksByItems(scrobbles, items)
+
+    let dcrobblesGroupedByTimestampGroupedByItemId: ScrobblesGroupedByTimestampGroupedByItemId[] = []
+
+    for (let itemGroup of itemGroups) {
+        let group: ScrobblesGroupedByTimestampGroupedByItemId = {
+            item: items.find(drink => drink.id == itemGroup.itemId),
+            itemId: itemGroup.itemId,
+            scrobblesGroupedByTimestamp: [],
+        }
+
+        for (let drinkDrank of itemGroup.scrobbles
+            .sort((drinkDrankA, drinkDrankB) =>
+                drinkDrankA.drank_timestamp_date().diff(drinkDrankB.drank_timestamp_date()).milliseconds
+            )
+        ) {
+            let byTimestamp = group.scrobblesGroupedByTimestamp
+                .find(x => x.timestamp.equals(drinkDrank.drank_timestamp_date()))
+
+            if (byTimestamp) {
+                byTimestamp.scrobbles.push(drinkDrank)
+            } else {
+                byTimestamp = {
+                    timestamp: drinkDrank.drank_timestamp_date(),
+                    scrobbles: [ drinkDrank ]
+                }
+
+                group.scrobblesGroupedByTimestamp.push(byTimestamp)
+            }
+        }
+
+        dcrobblesGroupedByTimestampGroupedByItemId.push(group)
+    }
+
+    return dcrobblesGroupedByTimestampGroupedByItemId
+}
+
 export class WeeklyScrobbles extends React.Component {
     async renderChart() {
         const api = new Api()
@@ -71,87 +153,20 @@ export class WeeklyScrobbles extends React.Component {
         const drinkDranks = await api.listDrinkDranks()
         const drinks = await api.listDrinks()
 
-        interface DrinkGroup {
-            drinkId: number,
-            drinkDranks: DrinkDrank[],
-        }
-
-        let drinkGroups: DrinkGroup[] = drinkDranks
-            .map(x => x.drink_id)
-            .filter(onlyUnique)
-            .map(x => {
-                let drinkGroup: DrinkGroup = {
-                    drinkId: x,
-                    drinkDranks: [],
-                }
-
-                return drinkGroup
-            })
-
-        for (let drinkDrank of drinkDranks) {
-            let drinkGroup = drinkGroups.find(drinkGroup => drinkGroup.drinkId == drinkDrank.drink_id)
-
-            drinkGroup.drinkDranks.push(drinkDrank)
-        }
-
-        drinkGroups = drinkGroups
-            .sort((drinkGroupA, drinkGroupB) => drinkGroupA.drinkId - drinkGroupB.drinkId)
-
-        interface DrinkDranksGroupedByTimestamp {
-            timestamp: luxon.DateTime,
-            drinkDranks: DrinkDrank[],
-        }
-
-        interface DrinkDranksGroupedByTimestampGroupedByDrinkId {
-            drink?: Drink,
-            drinkId: number,
-            drinkDranksGroupedByTimestamp: DrinkDranksGroupedByTimestamp[],
-        }
-
-        let drinkDranksGroupedByTimestampGroupedByDrinkId: DrinkDranksGroupedByTimestampGroupedByDrinkId[] = []
-
-        for (let drinkGroup of drinkGroups) {
-            let group: DrinkDranksGroupedByTimestampGroupedByDrinkId = {
-                drink: drinks.find(drink => drink.id == drinkGroup.drinkId),
-                drinkId: drinkGroup.drinkId,
-                drinkDranksGroupedByTimestamp: [],
-            }
-
-            for (let drinkDrank of drinkGroup.drinkDranks
-                .sort((drinkDrankA, drinkDrankB) =>
-                    drinkDrankA.drank_timestamp_date().diff(drinkDrankB.drank_timestamp_date()).milliseconds
-                )
-            ) {
-                let byTimestamp = group.drinkDranksGroupedByTimestamp
-                    .find(x => x.timestamp.equals(drinkDrank.drank_timestamp_date()))
-
-                if (byTimestamp) {
-                    byTimestamp.drinkDranks.push(drinkDrank)
-                } else {
-                    byTimestamp = {
-                        timestamp: drinkDrank.drank_timestamp_date(),
-                        drinkDranks: [ drinkDrank ]
-                    }
-
-                    group.drinkDranksGroupedByTimestamp.push(byTimestamp)
-                }
-            }
-
-            drinkDranksGroupedByTimestampGroupedByDrinkId.push(group)
-        }
+        const drinkDranksGroupedByTimestampGroupedByDrinkId = groupDrinkDranksByTimeStampAndDrinkId(drinkDranks, drinks)
 
         new ChartJs.Chart(ctx, {
             type: 'bar',
             data: {
                 datasets: drinkDranksGroupedByTimestampGroupedByDrinkId.map(group => {
                     return {
-                        label: group.drink?.name ?? group.drinkId.toString(),
-                        backgroundColor: group.drink?.colour,
-                        stack: group.drinkId.toString(),
-                        data: group.drinkDranksGroupedByTimestamp.map(byTimestamp => {
+                        label: group.item?.name ?? group.itemId.toString(),
+                        backgroundColor: group.item?.colour,
+                        stack: group.itemId.toString(),
+                        data: group.scrobblesGroupedByTimestamp.map(byTimestamp => {
                             return {
                                 x: byTimestamp.timestamp.toString(),
-                                y: byTimestamp.drinkDranks.length,
+                                y: byTimestamp.scrobbles.length,
                             }
                         }) as ChartJs.ChartPoint[]
                     }

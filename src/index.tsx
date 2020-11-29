@@ -47,7 +47,7 @@ function App() {
                 </Toolbar>
             </AppBar>
             <Drawer variant="persistent" anchor="left" open={open}>
-                <IconButton edge="end" onClick={handleDrawerClose}>
+                <IconButton onClick={handleDrawerClose}>
                     <ChevronLeftIcon />
                 </IconButton>
                 <Divider />
