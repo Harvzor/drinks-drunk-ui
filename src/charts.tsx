@@ -63,15 +63,13 @@ export class AllItemsChart extends React.Component {
     }
 }
 
-export class Charts {
-    private _api = new Api()
-    async build() {
-        this.drinkDranksChart()
-    }
-    async drinkDranksChart() {
-        const ctx: any = document.getElementById('drink-dranks')
-        const drinkDranks = await this._api.listDrinkDranks()
-        const drinks = await this._api.listDrinks()
+export class WeeklyScrobbles extends React.Component {
+    async renderChart() {
+        const api = new Api()
+
+        const ctx: any = document.getElementById('weekly-scrobbles')
+        const drinkDranks = await api.listDrinkDranks()
+        const drinks = await api.listDrinks()
 
         interface DrinkGroup {
             drinkId: number,
@@ -203,5 +201,13 @@ export class Charts {
                 }
             }
         })
+    }
+    componentDidMount() {
+        this.renderChart()
+    }
+    render() {
+        return (
+            <canvas id="weekly-scrobbles"></canvas>
+        )
     }
 }

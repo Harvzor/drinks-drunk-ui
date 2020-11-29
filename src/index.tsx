@@ -23,7 +23,7 @@ import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import InboxIcon from '@material-ui/icons/MoveToInbox';
 import MailIcon from '@material-ui/icons/Mail';
 
-import { AllItemsChart } from './charts';
+import { AllItemsChart, WeeklyScrobbles } from './charts';
 
 function App() {
     const [open, setOpen] = React.useState(false);
@@ -47,7 +47,7 @@ function App() {
                 </Toolbar>
             </AppBar>
             <Drawer variant="persistent" anchor="left" open={open}>
-                <IconButton onClick={handleDrawerClose}>
+                <IconButton edge="end" onClick={handleDrawerClose}>
                     <ChevronLeftIcon />
                 </IconButton>
                 <Divider />
@@ -73,6 +73,7 @@ function App() {
                 <Container>
                     <h1>Life Scrobbler</h1>
                     <AllItemsChart/>
+                    <WeeklyScrobbles />
                     {/* <canvas id="drink-dranks"></canvas> */}
                     <Button variant="contained" color="primary">
                         Hello World
