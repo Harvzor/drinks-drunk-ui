@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import * as luxon from "luxon"
 
 import "fontsource-roboto/400-normal.css"
 
@@ -9,11 +10,9 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import Button from '@material-ui/core/Button';
 import Container from '@material-ui/core/Container';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import Divider from '@material-ui/core/Divider';
 
@@ -23,6 +22,7 @@ import InboxIcon from '@material-ui/icons/MoveToInbox';
 import MailIcon from '@material-ui/icons/Mail';
 
 import { AllItemsChart, HourlyScrobblesChart, DailyScrobblesChart } from './charts';
+import { ScrobbleList } from './scrobble-list';
 import { ScrobbleSummary } from './scrobble-summary';
 
 function App() {
@@ -73,6 +73,7 @@ function App() {
                 <Container>
                     <h1>Life Scrobbler</h1>
                     <ScrobbleSummary />
+                    <ScrobbleList />
                     <AllItemsChart/>
                     <HourlyScrobblesChart />
                     <DailyScrobblesChart />

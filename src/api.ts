@@ -17,7 +17,9 @@ export class DrinkDrank extends DrinkDrankDto {
         return drinkDrank
     }
     drank_timestamp_datetime() {
-        return luxon.DateTime.fromISO(this.drank_timestamp)
+        return luxon.DateTime
+            // API should return the time in UTC0.
+            .fromISO(this.drank_timestamp, { zone: "utc" })
     }
     // drank_timestamp_date() {
     //     let dateTime = this.drank_timestamp_datetime() 
