@@ -1,10 +1,9 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 
 import * as luxon from "luxon"
 import * as ChartJs from "chart.js"
 
-import { Api, Drink, DrinkDrank, DrinkDrankDto } from "./api"
+import { Api, Drink, DrinkDrank } from "./api"
 
 function onlyUnique(value, index, self) {
     return self.indexOf(value) === index
@@ -155,7 +154,7 @@ const groupScrobblesByTimeStampAndItemId = (scrobbles: DrinkDrank[], items: Drin
     return scrobblesGroupedByTimestampGroupedByItemId
 }
 
-export class HourlyScrobbles extends React.Component {
+export class HourlyScrobblesChart extends React.Component {
     async renderChart() {
         const api = new Api()
 
@@ -224,7 +223,7 @@ export class HourlyScrobbles extends React.Component {
     }
 }
 
-export class DailyScrobbles extends React.Component {
+export class DailyScrobblesChart extends React.Component {
     async renderChart() {
         const api = new Api()
 

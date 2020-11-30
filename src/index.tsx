@@ -19,11 +19,11 @@ import Divider from '@material-ui/core/Divider';
 
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import InboxIcon from '@material-ui/icons/MoveToInbox';
 import MailIcon from '@material-ui/icons/Mail';
 
-import { AllItemsChart, HourlyScrobbles, DailyScrobbles } from './charts';
+import { AllItemsChart, HourlyScrobblesChart, DailyScrobblesChart } from './charts';
+import { ScrobbleSummary } from './scrobble-summary';
 
 function App() {
     const [open, setOpen] = React.useState(false);
@@ -72,9 +72,10 @@ function App() {
             <main>
                 <Container>
                     <h1>Life Scrobbler</h1>
+                    <ScrobbleSummary />
                     <AllItemsChart/>
-                    <HourlyScrobbles />
-                    <DailyScrobbles />
+                    <HourlyScrobblesChart />
+                    <DailyScrobblesChart />
                 </Container>
             </main>
         </React.Fragment>
