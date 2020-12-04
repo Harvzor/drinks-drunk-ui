@@ -15,6 +15,8 @@ import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
 import Divider from '@material-ui/core/Divider';
+import Card from '@material-ui/core/Card';
+import CardContent from '@material-ui/core/CardContent';
 
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
@@ -73,10 +75,26 @@ function App() {
                 <Container>
                     <h1>Life Scrobbler</h1>
                     <ScrobbleSummary />
+                    <h2>Recent</h2>
                     <ScrobbleList />
-                    <AllItemsChart/>
-                    <HourlyScrobblesChart />
-                    <DailyScrobblesChart />
+                    <h2>Top Items</h2>
+                    <Card>
+                        <CardContent>
+                            <AllItemsChart/>
+                        </CardContent>
+                    </Card>
+                    <h2>Hourly View of Scrobbles (last 3 days)</h2>
+                    <Card>
+                        <CardContent>
+                            <HourlyScrobblesChart />
+                        </CardContent>
+                    </Card>
+                    <h2>Daily View of Scrobbles (last 30 days)</h2>
+                    <Card>
+                        <CardContent>
+                            <DailyScrobblesChart />
+                        </CardContent>
+                    </Card>
                 </Container>
             </main>
         </React.Fragment>

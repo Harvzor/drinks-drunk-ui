@@ -37,6 +37,9 @@ export class AllItemsChart extends React.Component {
                 // }),
             },
             options: {
+                legend: {
+                    display: false,
+                },
                 // title: {
                 //     display: true,
                 //     text: "Items",
@@ -184,10 +187,10 @@ export class HourlyScrobblesChart extends React.Component {
                 }) as ChartJs.ChartDataSets[]
             },
             options: {
-                title: {
-                    display: true,
-                    text: "Hourly view of scrobbles (last 3 days)",
-                },
+                // title: {
+                //     display: true,
+                //     text: "Hourly view of scrobbles (last 3 days)",
+                // },
                 scales: {
                     xAxes: [{
                         type: 'time',
@@ -255,10 +258,10 @@ export class DailyScrobblesChart extends React.Component {
                 }) as ChartJs.ChartDataSets[]
             },
             options: {
-                title: {
-                    display: true,
-                    text: "Daily view of scrobbles (last 30 days)",
-                },
+                // title: {
+                //     display: true,
+                //     text: "Daily view of scrobbles (last 30 days)",
+                // },
                 scales: {
                     xAxes: [{
                         type: 'time',

@@ -43,8 +43,7 @@ export class ScrobbleList extends React.Component {
     render() {
         return (
             <Grid container>
-                <Grid item sm={6}>
-                    <h2>Recent Scrobbles</h2>
+                <Grid item sm={12}>
                     {this.state.loading
                         ? <>
                             { [...Array(10)].map((_, index) => <Skeleton key={index} />) }
@@ -55,7 +54,9 @@ export class ScrobbleList extends React.Component {
                                 {this.state.scrobbles.map((scrobble: DrinkDrank) => (
                                     <TableRow key={scrobble.id}>
                                         <TableCell component="th" scope="row">
-                                            { this.state.items.find(item => item.id === scrobble.drink_id)?.name ?? scrobble.drink_id }
+                                            <span style={{ color: this.state.items.find(item => item.id === scrobble.drink_id)?.colour ?? 'inherit' }}>
+                                                { this.state.items.find(item => item.id === scrobble.drink_id)?.name ?? scrobble.drink_id }
+                                            </span>
                                         </TableCell>
                                         <TableCell align="right">
                                             <Tooltip title={ scrobble.drank_timestamp_datetime().toLocaleString(luxon.DateTime.DATETIME_FULL) } placement="bottom">

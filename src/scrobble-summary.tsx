@@ -35,7 +35,7 @@ export class ScrobbleSummary extends React.Component {
     render() {
         return (
             <Grid container direction="row" justify="flex-start" alignItems="flex-start" spacing={3}>
-                <Grid item sm={3}>
+                <Grid item sm={4}>
                     <Card>
                         <CardContent>
                             <Typography color="textSecondary" gutterBottom>
@@ -47,19 +47,21 @@ export class ScrobbleSummary extends React.Component {
                         </CardContent>
                     </Card>
                 </Grid>
-                <Grid item sm={3}>
+                <Grid item sm={4}>
                     <Card>
                         <CardContent>
                             <Typography color="textSecondary" gutterBottom>
                                 Most popular item
                             </Typography>
                             <Typography variant="h5" component="h2">
-                                {this.state.mostPopularItem ? this.state.mostPopularItem.name : 'Loading...'}
+                                <span style={{ color: this.state.mostPopularItem?.colour ?? 'inherit' }}>
+                                    {this.state.mostPopularItem ? this.state.mostPopularItem.name : 'Loading...'}
+                                </span>
                             </Typography>
                         </CardContent>
                     </Card>
                 </Grid>
-                <Grid item sm={3}>
+                <Grid item sm={4}>
                     <Card>
                         <CardContent>
                             <Typography color="textSecondary" gutterBottom>
