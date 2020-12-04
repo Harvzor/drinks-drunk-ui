@@ -14,7 +14,7 @@ export class AllItemsChart extends React.Component {
         const api  = new Api()
 
         const ctx: any = document.getElementById('all-items')
-        const drinks = await api.listDrinks()
+        const drinks = await api.listItems()
 
         new ChartJs.Chart(ctx, {
             type: 'bar',
@@ -159,10 +159,12 @@ export class HourlyScrobblesChart extends React.Component {
         const api = new Api()
 
         const ctx: any = document.getElementById('hourly-scrobbles')
-        const drinkDranks = await api.listDrinkDranks()
-        const drinks = await api.listDrinks()
+        const scrobbles = await api.listScrobbles({
+            from: luxon.DateTime.local().plus({ day: -3}),
+        })
+        const items = await api.listItems()
 
-        const scrobblesGroupedByTimestampGroupedByDrinkId = groupScrobblesByTimeStampAndItemId(drinkDranks, drinks, 'hour')
+        const scrobblesGroupedByTimestampGroupedByDrinkId = groupScrobblesByTimeStampAndItemId(scrobbles, items, 'hour')
 
         new ChartJs.Chart(ctx, {
             type: 'bar',
@@ -228,10 +230,12 @@ export class DailyScrobblesChart extends React.Component {
         const api = new Api()
 
         const ctx: any = document.getElementById('daily-scrobbles')
-        const drinkDranks = await api.listDrinkDranks()
-        const drinks = await api.listDrinks()
+        const scrobbles = await api.listScrobbles({
+            from: luxon.DateTime.local().plus({ month: -1 }),
+        })
+        const drinks = await api.listItems()
 
-        const scrobblesGroupedByTimestampGroupedByDrinkId = groupScrobblesByTimeStampAndItemId(drinkDranks, drinks, 'day')
+        const scrobblesGroupedByTimestampGroupedByDrinkId = groupScrobblesByTimeStampAndItemId(scrobbles, drinks, 'day')
 
         new ChartJs.Chart(ctx, {
             type: 'bar',

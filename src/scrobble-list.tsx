@@ -29,8 +29,10 @@ export class ScrobbleList extends React.Component {
     async setup() {
         const api  = new Api()
         
-        const items = await api.listDrinks()
-        const scrobbles = (await api.listDrinkDranks())
+        const items = await api.listItems()
+        const scrobbles = (await api.listScrobbles({
+                take: 10,
+            }))
             .sort((itemA, itemB) => itemB.drank_timestamp_datetime().diff(itemA.drank_timestamp_datetime()).milliseconds)
 
         this.setState({ loading: false, items, scrobbles, })

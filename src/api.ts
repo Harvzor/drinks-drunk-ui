@@ -36,9 +36,17 @@ export interface Drink {
     colour: string
 }
 
+export interface ListScrobblesOptions {
+    itemId?: number
+    skip?: number
+    take?: number
+    from?: luxon.DateTime
+    to?: luxon.DateTime
+}
+
 export class Api {
     private _domain = 'http://localhost:8000'
-    async listDrinks(): Promise<Drink[]> {
+    async listItems(): Promise<Drink[]> {
         const drinks: Drink[] = await fetch(this._domain + "/drinks", {
             mode: 'cors'
         })
@@ -49,9 +57,27 @@ export class Api {
 
         return drinks
     }
-    async listDrinkDranks(drinkId?: number): Promise<DrinkDrank[]> {
-        const drinkDrankDtos: DrinkDrankDto[] = await fetch(this._domain + "/drink_dranks", {
-            mode: 'cors'
+    async listScrobbles(options?: ListScrobblesOptions): Promise<DrinkDrank[]> {
+        const url = new URL(this._domain + "/drink_dranks")
+
+        let params: any = {}
+
+        if (options?.skip)
+            params.skip = options.skip.toString()
+
+        if (options?.take)
+            params.take = options.take.toString()
+
+        if (options?.from)
+            params.from = options.from.toISO({ includeOffset: false, })
+
+        if (options?.to)
+            params.to = options.to.toISO({ includeOffset: false, })
+
+        url.search = new URLSearchParams(params).toString()
+
+        const drinkDrankDtos: DrinkDrankDto[] = await fetch(url.toString(), {
+            mode: 'cors',
         })
         .then(res => res.json())
         .catch((reason) => {

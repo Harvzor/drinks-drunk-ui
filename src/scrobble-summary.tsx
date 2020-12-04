@@ -22,7 +22,7 @@ export class ScrobbleSummary extends React.Component {
     async setup() {
         const api  = new Api()
         
-        const items = await api.listDrinks()
+        const items = await api.listItems()
 
         const sum = items.reduce((s, item) => s + item.count, 0)
         const mostPopularItem = items.sort((a, b) => a.count - b.count)[0]
