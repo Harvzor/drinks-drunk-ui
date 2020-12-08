@@ -4,6 +4,7 @@ import * as luxon from "luxon"
 
 import "fontsource-roboto/400-normal.css"
 
+import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Drawer from '@material-ui/core/Drawer';
 import List from '@material-ui/core/List';
@@ -27,16 +28,29 @@ import { AllItemsChart, HourlyScrobblesChart, DailyScrobblesChart } from './char
 import { ScrobbleList } from './scrobble-list';
 import { ScrobbleSummary } from './scrobble-summary';
 
+const useStyles = makeStyles((theme: Theme) => createStyles({
+    drawerHeader: {
+        display: 'flex',
+        alignItems: 'center',
+        padding: theme.spacing(0, 1),
+        // necessary for content to be below app bar
+        ...theme.mixins.toolbar,
+        justifyContent: 'flex-end',
+    },
+  })
+)
+
 function App() {
-    const [open, setOpen] = React.useState(false);
+    const classes = useStyles()
+    const [open, setOpen] = React.useState(false)
 
     const handleDrawerOpen = () => {
-        setOpen(true);
-    };
+        setOpen(true)
+    }
 
     const handleDrawerClose = () => {
-        setOpen(false);
-    };
+        setOpen(false)
+    }
 
     return (
         <React.Fragment>
@@ -49,9 +63,11 @@ function App() {
                 </Toolbar>
             </AppBar>
             <Drawer variant="persistent" anchor="left" open={open}>
-                <IconButton onClick={handleDrawerClose}>
-                    <ChevronLeftIcon />
-                </IconButton>
+                <div className={classes.drawerHeader}>
+                    <IconButton onClick={handleDrawerClose}>
+                        <ChevronLeftIcon />
+                    </IconButton>
+                </div>
                 <Divider />
                 <List>
                     {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
