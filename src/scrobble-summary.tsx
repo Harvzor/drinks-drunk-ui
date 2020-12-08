@@ -7,6 +7,8 @@ import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
 
+import Skeleton from '@material-ui/lab/Skeleton';
+
 class ScrobbleSummaryState {
     items: Drink[]
     sum: number
@@ -32,47 +34,49 @@ export class ScrobbleSummary extends React.Component {
     componentDidMount() {
         this.setup()
     }
+    renderSummary(title: string, content: any): JSX.Element {
+        console.log(content)
+
+        return (
+            <Grid item sm={4}>
+                <Card>
+                    <CardContent>
+                        <Typography color="textSecondary" gutterBottom>
+                            {title}
+                        </Typography>
+                        {content
+                            ? <Typography color="textSecondary" gutterBottom>
+                                {content}
+                            </Typography>
+                            : <Skeleton />
+                        }
+                    </CardContent>
+                </Card>
+            </Grid>
+        )
+    }
     render() {
         return (
             <Grid container direction="row" justify="flex-start" alignItems="flex-start" spacing={3}>
-                <Grid item sm={4}>
-                    <Card>
-                        <CardContent>
-                            <Typography color="textSecondary" gutterBottom>
-                                Scrobbles
-                            </Typography>
-                            <Typography variant="h5" component="h2">
-                                {this.state.sum ? this.state.sum : 'Loading...'}
-                            </Typography>
-                        </CardContent>
-                    </Card>
-                </Grid>
+                {this.renderSummary('Scrobbles', this.state.sum)}
                 <Grid item sm={4}>
                     <Card>
                         <CardContent>
                             <Typography color="textSecondary" gutterBottom>
                                 Most popular item
                             </Typography>
-                            <Typography variant="h5" component="h2">
-                                <span style={{ color: this.state.mostPopularItem?.colour ?? 'inherit' }}>
-                                    {this.state.mostPopularItem ? this.state.mostPopularItem.name : 'Loading...'}
-                                </span>
-                            </Typography>
+                            {this.state.mostPopularItem 
+                                ? <Typography variant="h5" component="h2">
+                                    <span style={{ color: this.state.mostPopularItem?.colour ?? 'inherit' }}>
+                                        {this.state.mostPopularItem.name}
+                                    </span>
+                                </Typography>
+                                : <Skeleton />
+                            }
                         </CardContent>
                     </Card>
                 </Grid>
-                <Grid item sm={4}>
-                    <Card>
-                        <CardContent>
-                            <Typography color="textSecondary" gutterBottom>
-                                Total active items
-                            </Typography>
-                            <Typography variant="h5" component="h2">
-                                {this.state.items ? this.state.items.length : 'Loading...'}
-                            </Typography>
-                        </CardContent>
-                    </Card>
-                </Grid>
+                {this.renderSummary('Total active items', this.state.items?.length)}
             </Grid>
         )
     }
