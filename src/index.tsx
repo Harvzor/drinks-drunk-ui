@@ -1,6 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import * as luxon from "luxon"
+
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link
+} from "react-router-dom";
 
 import "fontsource-roboto/400-normal.css"
 
@@ -60,65 +66,75 @@ function App() {
 
     return (
         <React.Fragment>
-            <CssBaseline />
-            <AppBar position="static">
-                <Toolbar>
-                    <IconButton edge="start" color="inherit" aria-label="menu" onClick={handleDrawerOpen}>
-                        <MenuIcon />
-                    </IconButton>
-                </Toolbar>
-            </AppBar>
-            <Drawer className={classes.drawer} variant="persistent" anchor="left" open={open} classes={{ paper: classes.drawerPaper, }}>
-                <div className={classes.drawerHeader}>
-                    <IconButton onClick={handleDrawerClose}>
-                        <ChevronLeftIcon />
-                    </IconButton>
-                </div>
-                <Divider />
-                <List>
-                    {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-                        <ListItem button key={text}>
-                            <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
-                            <ListItemText primary={text} />
-                        </ListItem>
-                    ))}
-                </List>
-                <Divider />
-                <List>
-                    {['All mail', 'Trash', 'Spam'].map((text, index) => (
-                        <ListItem button key={text}>
-                            <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
-                            <ListItemText primary={text} />
-                        </ListItem>
-                    ))}
-                </List>
-            </Drawer>
-            <main>
-                <Container>
-                    <h1>Life Scrobbler</h1>
-                    <ScrobbleSummary />
-                    <h2>Recent</h2>
-                    <ScrobbleList />
-                    <h2>Top Items</h2>
-                    <Card>
-                        <CardContent>
-                            <AllItemsChart/>
-                        </CardContent>
-                    </Card>
-                    <h2>Hourly View of Scrobbles (last 3 days)</h2>
-                    <Card>
-                        <CardContent>
-                            <HourlyScrobblesChart />
-                        </CardContent>
-                    </Card>
-                    <h2>Daily View of Scrobbles (last 30 days)</h2>
-                    <Card>
-                        <CardContent>
-                            <DailyScrobblesChart />
-                        </CardContent>
-                    </Card>
-                </Container>
-            </main>
+            <Router>
+                <CssBaseline />
+                <AppBar position="static">
+                    <Toolbar>
+                        <IconButton edge="start" color="inherit" aria-label="menu" onClick={handleDrawerOpen}>
+                            <MenuIcon />
+                        </IconButton>
+                    </Toolbar>
+                </AppBar>
+                <Drawer className={classes.drawer} variant="persistent" anchor="left" open={open} classes={{ paper: classes.drawerPaper, }}>
+                    <div className={classes.drawerHeader}>
+                        <IconButton onClick={handleDrawerClose}>
+                            <ChevronLeftIcon />
+                        </IconButton>
+                    </div>
+                    <Divider />
+                    <List>
+                        <Link to="/">
+                            <ListItem button>
+                                <ListItemIcon>
+                                    <InboxIcon />
+                                </ListItemIcon>
+                                <ListItemText primary="Home" />
+                            </ListItem>
+                        </Link>
+                        <Link to="/create">
+                            <ListItem button>
+                                <ListItemIcon>
+                                    <InboxIcon />
+                                </ListItemIcon>
+                                <ListItemText primary="Create new item" />
+                            </ListItem>
+                        </Link>
+                    </List>
+                </Drawer>
+                <main>
+                    <Container>
+                        <Switch>
+                            <Route path="/create">
+                                <h1>Create</h1>
+                            </Route>
+                            <Route path="/">
+                                <h1>Life Scrobbler</h1>
+                                <ScrobbleSummary />
+                                <h2>Recent</h2>
+                                <ScrobbleList />
+                                <h2>Top Items</h2>
+                                <Card>
+                                    <CardContent>
+                                        <AllItemsChart/>
+                                    </CardContent>
+                                </Card>
+                                <h2>Hourly View of Scrobbles (last 3 days)</h2>
+                                <Card>
+                                    <CardContent>
+                                        <HourlyScrobblesChart />
+                                    </CardContent>
+                                </Card>
+                                <h2>Daily View of Scrobbles (last 30 days)</h2>
+                                <Card>
+                                    <CardContent>
+                                        <DailyScrobblesChart />
+                                    </CardContent>
+                                </Card>
+                            </Route>
+                        </Switch>
+                    </Container>
+                </main>
+            </Router>
         </React.Fragment>
     );
 }
