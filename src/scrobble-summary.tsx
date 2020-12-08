@@ -35,25 +35,21 @@ export class ScrobbleSummary extends React.Component {
         this.setup()
     }
     renderSummary(title: string, content: any): JSX.Element {
-        console.log(content)
-
-        return (
-            <Grid item sm={4}>
-                <Card>
-                    <CardContent>
-                        <Typography color="textSecondary" gutterBottom>
-                            {title}
+        return <Grid item sm={4}>
+            <Card>
+                <CardContent>
+                    <Typography color="textSecondary" gutterBottom>
+                        {title}
+                    </Typography>
+                    {content
+                        ? <Typography variant="h5" component="h2">
+                            {content}
                         </Typography>
-                        {content
-                            ? <Typography color="textSecondary" gutterBottom>
-                                {content}
-                            </Typography>
-                            : <Skeleton />
-                        }
-                    </CardContent>
-                </Card>
-            </Grid>
-        )
+                        : <Skeleton />
+                    }
+                </CardContent>
+            </Card>
+        </Grid>
     }
     render() {
         return (
