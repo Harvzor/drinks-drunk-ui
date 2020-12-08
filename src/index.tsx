@@ -29,6 +29,12 @@ import { ScrobbleList } from './scrobble-list';
 import { ScrobbleSummary } from './scrobble-summary';
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
+    drawer: {
+        width: 240,
+    },
+    drawerPaper: {
+        width: 240,
+    },
     drawerHeader: {
         display: 'flex',
         alignItems: 'center',
@@ -62,7 +68,7 @@ function App() {
                     </IconButton>
                 </Toolbar>
             </AppBar>
-            <Drawer variant="persistent" anchor="left" open={open}>
+            <Drawer className={classes.drawer} variant="persistent" anchor="left" open={open} classes={{ paper: classes.drawerPaper, }}>
                 <div className={classes.drawerHeader}>
                     <IconButton onClick={handleDrawerClose}>
                         <ChevronLeftIcon />
