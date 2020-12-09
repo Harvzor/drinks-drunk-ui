@@ -28,13 +28,16 @@ import CardContent from '@material-ui/core/CardContent';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import InboxIcon from '@material-ui/icons/MoveToInbox';
-import MailIcon from '@material-ui/icons/Mail';
 
 import { AllItemsChart, HourlyScrobblesChart, DailyScrobblesChart } from './charts';
 import { ScrobbleList } from './scrobble-list';
 import { ScrobbleSummary } from './scrobble-summary';
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
+    anchor: {
+        color: 'black',
+        textDecoration: 'none',
+    },
     drawer: {
         width: 240,
     },
@@ -83,7 +86,7 @@ function App() {
                     </div>
                     <Divider />
                     <List>
-                        <Link to="/">
+                        <Link to="/" className={classes.anchor}>
                             <ListItem button>
                                 <ListItemIcon>
                                     <InboxIcon />
@@ -91,7 +94,7 @@ function App() {
                                 <ListItemText primary="Home" />
                             </ListItem>
                         </Link>
-                        <Link to="/create">
+                        <Link to="/create" className={classes.anchor}>
                             <ListItem button>
                                 <ListItemIcon>
                                     <InboxIcon />
