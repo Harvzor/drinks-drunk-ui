@@ -22,16 +22,13 @@ import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
 import Divider from '@material-ui/core/Divider';
-import Card from '@material-ui/core/Card';
-import CardContent from '@material-ui/core/CardContent';
 
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import InboxIcon from '@material-ui/icons/MoveToInbox';
 
-import { AllItemsChart, HourlyScrobblesChart, DailyScrobblesChart } from './charts';
-import { ScrobbleList } from './scrobble-list';
-import { ScrobbleSummary } from './scrobble-summary';
+import { Home } from './views/home';
+import { Create } from './views/create';
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
     anchor: {
@@ -108,31 +105,10 @@ function App() {
                     <Container>
                         <Switch>
                             <Route path="/create">
-                                <h1>Create</h1>
+                                <Create />
                             </Route>
                             <Route path="/">
-                                <h1>Life Scrobbler</h1>
-                                <ScrobbleSummary />
-                                <h2>Recent</h2>
-                                <ScrobbleList />
-                                <h2>Top Items</h2>
-                                <Card>
-                                    <CardContent>
-                                        <AllItemsChart/>
-                                    </CardContent>
-                                </Card>
-                                <h2>Hourly View of Scrobbles (last 3 days)</h2>
-                                <Card>
-                                    <CardContent>
-                                        <HourlyScrobblesChart />
-                                    </CardContent>
-                                </Card>
-                                <h2>Daily View of Scrobbles (last 30 days)</h2>
-                                <Card>
-                                    <CardContent>
-                                        <DailyScrobblesChart />
-                                    </CardContent>
-                                </Card>
+                                <Home />
                             </Route>
                         </Switch>
                     </Container>
