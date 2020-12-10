@@ -1,12 +1,9 @@
 const path = require('path');
-const { spawn } = require('child_process');
-
-spawn('node node_modules\\http-server\\bin\\http-server', {
-  stdio: ['ignore', 'inherit', 'inherit'],
-  shell: true
-});
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 module.exports = {
+  mode: 'development',
   entry: './src/index.tsx',
   devtool: 'inline-source-map',
   module: {
@@ -43,5 +40,21 @@ module.exports = {
   output: {
     filename: 'bundle.js',
     path: path.resolve(__dirname, 'dist'),
+  },
+  plugins: [
+    new CleanWebpackPlugin(),
+    new CleanWebpackPlugin({ cleanStaleWebpackAssets: false }),
+    new HtmlWebpackPlugin({
+      title: 'Scrobbler',
+    }),
+  ],
+  devServer: {
+    contentBase: path.join(__dirname, 'dist'),
+    compress: true,
+    port: 9000,
+    // https://stackoverflow.com/questions/31945763/how-to-tell-webpack-dev-server-to-serve-index-html-for-any-route
+    historyApiFallback: {
+      index: 'index.html'
+    },
   },
 };

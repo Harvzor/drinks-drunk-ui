@@ -118,4 +118,15 @@ function App() {
     );
 }
 
-ReactDOM.render(<App />, document.querySelector('#app'));
+const renderApp = () => {
+    let app = document.createElement('div')
+    app.id = '#app'
+
+    const body = document.querySelector('body')
+
+    body.append(app)
+
+    ReactDOM.render(<App />, app)
+}
+
+renderApp()
