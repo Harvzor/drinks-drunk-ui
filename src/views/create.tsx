@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { Api, Item } from "../api"
+
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
@@ -7,42 +9,38 @@ import Button from '@material-ui/core/Button';
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         root: {
-            '& .MuiTextField-root': {
-                margin: theme.spacing(1),
+            '& > div': {
+                marginTop: theme.spacing(1),
+                marginBottom: theme.spacing(1),
             },
         },
     }),
 )
 
 export function Create() {
-    const [itemName, setItemName] = React.useState(null)
+    const [itemName, setItemName] = React.useState('')
+    const [itemColour, setItemColour] = React.useState('')
 
     const classes = useStyles()
 
-    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const target = event.target;
-        const value = target.type === 'checkbox' ? target.checked : target.value;
-        const name = target.name;
-
-        // this.setState({
-        //     [name]: value
-        // })
-
-        // Todo: use generic code
-        setItemName(value)
-    }
+    const api = new Api()
 
     const handleSubmit= (e: React.FormEvent) => {
         e.preventDefault()
 
-        console.log(this.state)
+        api.createItem(itemName, itemColour)
     }
 
     return (
         <>
             <h1>Create</h1>
             <form className={classes.root} onSubmit={handleSubmit}>
-                <TextField name="itemName" value={itemName} onChange={handleChange} label="Item name" variant="outlined" />
+                <div>
+                    <TextField name="itemName" value={itemName} onChange={e => setItemName(e.target.value)} label="Name" variant="outlined" />
+                </div>
+                <div>
+                    <TextField name="itemColour" value={itemColour} onChange={e => setItemColour(e.target.value)} label="Colour" variant="outlined" />
+                </div>
                 <div>
                     <Button variant="contained" color="primary" type="submit">
                         Submit

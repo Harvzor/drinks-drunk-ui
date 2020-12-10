@@ -1,7 +1,7 @@
 import React from 'react';
 import * as luxon from "luxon"
 
-import { Api, Drink, DrinkDrank } from "./api"
+import { Api, Item, Scrobble } from "./api"
 
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -16,8 +16,8 @@ import Skeleton from '@material-ui/lab/Skeleton';
 
 class ScrobbleListState {
     loading: boolean
-    items: Drink[]
-    scrobbles: DrinkDrank[]
+    items: Item[]
+    scrobbles: Scrobble[]
 }
 
 export class ScrobbleList extends React.Component {
@@ -33,7 +33,7 @@ export class ScrobbleList extends React.Component {
         const scrobbles = (await api.listScrobbles({
                 take: 10,
             }))
-            .sort((itemA, itemB) => itemB.drank_timestamp_datetime().diff(itemA.drank_timestamp_datetime()).milliseconds)
+            .sort((itemA, itemB) => itemB.scrobble_timestamp_datetime().diff(itemA.scrobble_timestamp_datetime()).milliseconds)
 
         this.setState({ loading: false, items, scrobbles, })
     }
@@ -51,7 +51,7 @@ export class ScrobbleList extends React.Component {
                         : <TableContainer component={Paper}>
                             <Table aria-label="simple table">
                                 <TableBody>
-                                {this.state.scrobbles.map((scrobble: DrinkDrank) => (
+                                {this.state.scrobbles.map((scrobble: Scrobble) => (
                                     <TableRow key={scrobble.id}>
                                         <TableCell component="th" scope="row">
                                             <span style={{ color: this.state.items.find(item => item.id === scrobble.drink_id)?.colour ?? 'inherit' }}>
@@ -59,9 +59,9 @@ export class ScrobbleList extends React.Component {
                                             </span>
                                         </TableCell>
                                         <TableCell align="right">
-                                            <Tooltip title={ scrobble.drank_timestamp_datetime().toLocaleString(luxon.DateTime.DATETIME_FULL) } placement="bottom">
+                                            <Tooltip title={ scrobble.scrobble_timestamp_datetime().toLocaleString(luxon.DateTime.DATETIME_FULL) } placement="bottom">
                                                 <span>
-                                                    { scrobble.drank_timestamp_datetime().toRelative() }
+                                                    { scrobble.scrobble_timestamp_datetime().toRelative() }
                                                 </span>
                                             </Tooltip>
                                         </TableCell>

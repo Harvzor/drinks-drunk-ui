@@ -3,7 +3,7 @@ import React from 'react';
 import * as luxon from "luxon"
 import * as ChartJs from "chart.js"
 
-import { Api, Drink, DrinkDrank } from "./api"
+import { Api, Item, Scrobble } from "./api"
 
 function onlyUnique(value, index, self) {
     return self.indexOf(value) === index
@@ -67,21 +67,21 @@ export class AllItemsChart extends React.Component {
 
 interface ItemGroup {
     itemId: number,
-    scrobbles: DrinkDrank[],
+    scrobbles: Scrobble[],
 }
 
 interface ScrobblesGroupedByTimestamp {
     timestamp: luxon.DateTime,
-    scrobbles: DrinkDrank[],
+    scrobbles: Scrobble[],
 }
 
 interface ScrobblesGroupedByTimestampGroupedByItemId {
-    item?: Drink,
+    item?: Item,
     itemId: number,
     scrobblesGroupedByTimestamp: ScrobblesGroupedByTimestamp[],
 }
 
-const groupScrobblesByItems = (scrobbles: DrinkDrank[], items: Drink[]): ItemGroup[] => {
+const groupScrobblesByItems = (scrobbles: Scrobble[], items: Item[]): ItemGroup[] => {
     // Create the groups to be populated.
     let itemGroups: ItemGroup[] = scrobbles
         .map(x => x.drink_id)
@@ -109,7 +109,7 @@ const groupScrobblesByItems = (scrobbles: DrinkDrank[], items: Drink[]): ItemGro
     return itemGroups
 }
 
-const groupScrobblesByTimeStampAndItemId = (scrobbles: DrinkDrank[], items: Drink[], roundTo: luxon.DurationUnit): ScrobblesGroupedByTimestampGroupedByItemId[] => {
+const groupScrobblesByTimeStampAndItemId = (scrobbles: Scrobble[], items: Item[], roundTo: luxon.DurationUnit): ScrobblesGroupedByTimestampGroupedByItemId[] => {
     const itemGroups = groupScrobblesByItems(scrobbles, items)
 
     let scrobblesGroupedByTimestampGroupedByItemId: ScrobblesGroupedByTimestampGroupedByItemId[] = []
@@ -123,16 +123,16 @@ const groupScrobblesByTimeStampAndItemId = (scrobbles: DrinkDrank[], items: Drin
 
         for (let scrobble of itemGroup.scrobbles
             .sort((drinkDrankA, drinkDrankB) =>
-                drinkDrankA.drank_timestamp_datetime().diff(drinkDrankB.drank_timestamp_datetime()).milliseconds
+                drinkDrankA.scrobble_timestamp_datetime().diff(drinkDrankB.scrobble_timestamp_datetime()).milliseconds
             )
         ) {
             let byTimestamp = group.scrobblesGroupedByTimestamp
-                .find(x => x.timestamp.hasSame(scrobble.drank_timestamp_datetime(), roundTo))
+                .find(x => x.timestamp.hasSame(scrobble.scrobble_timestamp_datetime(), roundTo))
 
             if (byTimestamp) {
                 byTimestamp.scrobbles.push(scrobble)
             } else {
-                let t = scrobble.drank_timestamp_datetime()
+                let t = scrobble.scrobble_timestamp_datetime()
 
                 if (roundTo === "hour") {
                     t = t.plus({ minutes: -t.minute, seconds: -t.second, milliseconds: -t.millisecond })

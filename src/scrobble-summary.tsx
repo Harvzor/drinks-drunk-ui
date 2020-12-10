@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Api, Drink } from "./api"
+import { Api, Item } from "./api"
 
 import Grid from '@material-ui/core/Grid';
 import Card from '@material-ui/core/Card';
@@ -10,9 +10,9 @@ import Typography from '@material-ui/core/Typography';
 import Skeleton from '@material-ui/lab/Skeleton';
 
 class ScrobbleSummaryState {
-    items: Drink[]
+    items: Item[]
     sum: number
-    mostPopularItem: Drink
+    mostPopularItem: Item
 }
 
 export class ScrobbleSummary extends React.Component {

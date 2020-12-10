@@ -1,34 +1,29 @@
 import * as luxon from "luxon"
 
-export class DrinkDrankDto {
+export class ScrobbleDto {
     id: number
     drink_id: number
     drank_timestamp: string
 }
 
-export class DrinkDrank extends DrinkDrankDto {
-    static fromDrinkDrankDto(dto: DrinkDrankDto): DrinkDrank {
-        let drinkDrank = new DrinkDrank()
+export class Scrobble extends ScrobbleDto {
+    static fromItemDto(dto: ScrobbleDto) {
+        let scrobble = new Scrobble()
         
-        drinkDrank.id = dto.id
-        drinkDrank.drink_id = dto.drink_id
-        drinkDrank.drank_timestamp = dto.drank_timestamp
+        scrobble.id = dto.id
+        scrobble.drink_id = dto.drink_id
+        scrobble.drank_timestamp = dto.drank_timestamp
 
-        return drinkDrank
+        return scrobble
     }
-    drank_timestamp_datetime() {
+    scrobble_timestamp_datetime() {
         return luxon.DateTime
             // API should return the time in UTC0.
             .fromISO(this.drank_timestamp, { zone: "utc" })
     }
-    // drank_timestamp_date() {
-    //     let dateTime = this.drank_timestamp_datetime() 
-
-    //     return luxon.DateTime.local(dateTime.year, dateTime.month, dateTime.day, dateTime.hour)
-    // }
 }
 
-export interface Drink {
+export interface Item {
     id: number
     name: string
     count: number
@@ -46,8 +41,22 @@ export interface ListScrobblesOptions {
 
 export class Api {
     private _domain = 'http://localhost:8000'
-    async listItems(): Promise<Drink[]> {
-        const drinks: Drink[] = await fetch(this._domain + "/drinks", {
+    private async post(path: string, body: object) {
+        return await fetch(this._domain + path, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json;charset=utf-8'
+            },
+            body: JSON.stringify(body),
+            mode: 'cors'
+        })
+        .then(res => res.json())
+        .catch((reason) => {
+            console.error(reason)
+        })
+    }
+    async listItems(): Promise<Item[]> {
+        const drinks: Item[] = await fetch(this._domain + "/drinks", {
             mode: 'cors'
         })
         .then(res => res.json())
@@ -57,7 +66,7 @@ export class Api {
 
         return drinks
     }
-    async listScrobbles(options?: ListScrobblesOptions): Promise<DrinkDrank[]> {
+    async listScrobbles(options?: ListScrobblesOptions): Promise<Scrobble[]> {
         const url = new URL(this._domain + "/drink_dranks")
 
         let params: any = {}
@@ -76,7 +85,7 @@ export class Api {
 
         url.search = new URLSearchParams(params).toString()
 
-        const drinkDrankDtos: DrinkDrankDto[] = await fetch(url.toString(), {
+        const drinkDrankDtos: ScrobbleDto[] = await fetch(url.toString(), {
             mode: 'cors',
         })
         .then(res => res.json())
@@ -85,24 +94,21 @@ export class Api {
         })
 
         return drinkDrankDtos
-            .map(dto => DrinkDrank.fromDrinkDrankDto(dto))
+            .map(dto => Scrobble.fromItemDto(dto))
     }
-    async incrementDrink(drinkId: number): Promise<DrinkDrank> {
-        const drinkDrankDto: DrinkDrankDto = await fetch(this._domain + "/drink_dranks", {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json;charset=utf-8'
-            },
-            body: JSON.stringify({
-                drink_id: drinkId,
-            }),
-            mode: 'cors'
-        })
-        .then(res => res.json())
-        .catch((reason) => {
-            console.error(reason)
+    async incrementItem(itemId: number): Promise<Scrobble> {
+        const itemDto: ScrobbleDto = await this.post('/drink_drank', {
+            drink_id: itemId,
         })
 
-        return DrinkDrank.fromDrinkDrankDto(drinkDrankDto)
+        return Scrobble.fromItemDto(itemDto)
+    }
+    async createItem(name: string, colour: string): Promise<Item> {
+        const item: Item = await this.post('/drinks', {
+            name: name,
+            colour: colour,
+        })
+
+        return item
     }
 }
