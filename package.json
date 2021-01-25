@@ -2,7 +2,7 @@
   "scripts": {
     "start": "webpack serve",
     "watch": "webpack --watch",
-    "build": "webpack"
+    "build": "webpack --mode=production"
   },
   "dependencies": {
     "@material-ui/core": "^4.11.0",
