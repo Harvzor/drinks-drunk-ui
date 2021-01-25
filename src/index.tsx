@@ -28,7 +28,7 @@ import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import InboxIcon from '@material-ui/icons/MoveToInbox';
 
 import { Home } from './views/home';
-import { Create } from './views/create';
+import Create from './views/create';
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
     anchor: {
@@ -96,7 +96,7 @@ function App() {
                                 <ListItemIcon>
                                     <InboxIcon />
                                 </ListItemIcon>
-                                <ListItemText primary="Create new item" />
+                                <ListItemText primary="Manage items" />
                             </ListItem>
                         </Link>
                     </List>
