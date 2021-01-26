@@ -96,7 +96,7 @@ function App() {
                                 <ListItemIcon>
                                     <InboxIcon />
                                 </ListItemIcon>
-                                <ListItemText primary="Manage items" />
+                                <ListItemText primary="Manage trackables" />
                             </ListItem>
                         </Link>
                     </List>
