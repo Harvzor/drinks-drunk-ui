@@ -103,6 +103,9 @@ class Create extends React.Component<Props> {
                                             <TableCell component="th">
                                                 <Skeleton key={index} />
                                             </TableCell>
+                                            <TableCell>
+                                                <Skeleton key={index} />
+                                            </TableCell>
                                         </TableRow>
                                     )}
                                 </>

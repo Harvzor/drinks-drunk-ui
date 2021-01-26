@@ -44,33 +44,44 @@ export class ScrobbleList extends React.Component {
         return (
             <Grid container>
                 <Grid item sm={12}>
-                    {this.state.loading
-                        ? <>
-                            { [...Array(10)].map((_, index) => <Skeleton key={index} />) }
-                        </>
-                        : <TableContainer component={Paper}>
-                            <Table aria-label="simple table">
-                                <TableBody>
-                                {this.state.scrobbles.map((scrobble: Scrobble) => (
-                                    <TableRow key={scrobble.id}>
-                                        <TableCell component="th" scope="row">
-                                            <span style={{ color: this.state.items.find(item => item.id === scrobble.drink_id)?.colour ?? 'inherit' }}>
-                                                { this.state.items.find(item => item.id === scrobble.drink_id)?.name ?? scrobble.drink_id }
-                                            </span>
-                                        </TableCell>
-                                        <TableCell align="right">
-                                            <Tooltip title={ scrobble.scrobble_timestamp_datetime().toLocaleString(luxon.DateTime.DATETIME_FULL) } placement="bottom">
-                                                <span>
-                                                    { scrobble.scrobble_timestamp_datetime().toRelative() }
-                                                </span>
-                                            </Tooltip>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
-                    }
+                    <TableContainer component={Paper}>
+                        <Table aria-label="simple table">
+                            <TableBody>
+                                {this.state.loading
+                                    ? <>
+                                        { [...Array(10)].map((_, index) =>
+                                            <TableRow key={index}>
+                                                <TableCell>
+                                                    <Skeleton key={index} />
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Skeleton key={index} />
+                                                </TableCell>
+                                            </TableRow>
+                                        )}
+                                    </>
+                                    : <>
+                                            {this.state.scrobbles.map((scrobble: Scrobble) => (
+                                                <TableRow key={scrobble.id}>
+                                                    <TableCell component="th" scope="row">
+                                                        <span style={{ color: this.state.items.find(item => item.id === scrobble.drink_id)?.colour ?? 'inherit' }}>
+                                                            { this.state.items.find(item => item.id === scrobble.drink_id)?.name ?? scrobble.drink_id }
+                                                        </span>
+                                                    </TableCell>
+                                                    <TableCell align="right">
+                                                        <Tooltip title={ scrobble.scrobble_timestamp_datetime().toLocaleString(luxon.DateTime.DATETIME_FULL) } placement="bottom">
+                                                            <span>
+                                                                { scrobble.scrobble_timestamp_datetime().toRelative() }
+                                                            </span>
+                                                        </Tooltip>
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))}
+                                    </>
+                                }
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
                 </Grid>
             </Grid>
         )
