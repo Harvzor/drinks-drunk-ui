@@ -7,7 +7,7 @@
 ## Getting started with development
 
 1. `npm install`
-1. `npm run watch`
+1. `npm start`
 
 ## Building
 
