@@ -3,28 +3,28 @@ import React from 'react';
 import * as luxon from "luxon"
 import * as ChartJs from "chart.js"
 
-import { Api, Item, Scrobble } from "./api"
+import { Api, Trackable, Scrobble } from "./api"
 
 function onlyUnique(value, index, self) {
     return self.indexOf(value) === index
 }
 
-export class AllItemsChart extends React.Component {
+export class AllTrackablesChart extends React.Component {
     async renderChart() {
         const api  = new Api()
 
-        const ctx: any = document.getElementById('all-items')
-        const drinks = await api.listItems()
+        const ctx: any = document.getElementById('all-trackables')
+        const trackables = await api.listTrackables()
 
         new ChartJs.Chart(ctx, {
             type: 'bar',
             data: {
-                labels: drinks.map(drink => drink.name),
+                labels: trackables.map(trackable => trackable.name),
                 datasets: [{
-                    label: 'Items',
-                    data: drinks.map(drink => drink.count),
+                    label: 'trackables',
+                    data: trackables.map(trackable => trackable.count),
                     borderWidth: 1,
-                    backgroundColor: drinks.map(drink => drink.colour),
+                    backgroundColor: trackables.map(trackable => trackable.colour),
                 }]
                 // datasets: drinks.map(drink => {
                 //     let dataset/*: Chart.ChartDataSets*/ = {
@@ -42,7 +42,7 @@ export class AllItemsChart extends React.Component {
                 },
                 // title: {
                 //     display: true,
-                //     text: "Items",
+                //     text: "Trackables",
                 // },
                 scales: {
                     yAxes: [{
@@ -60,13 +60,13 @@ export class AllItemsChart extends React.Component {
     }
     render() {
         return (
-            <canvas id="all-items"></canvas>
+            <canvas id="all-trackables"></canvas>
         )
     }
 }
 
-interface ItemGroup {
-    itemId: number,
+interface ScrobbleGroup {
+    trackableId: number,
     scrobbles: Scrobble[],
 }
 
@@ -75,55 +75,55 @@ interface ScrobblesGroupedByTimestamp {
     scrobbles: Scrobble[],
 }
 
-interface ScrobblesGroupedByTimestampGroupedByItemId {
-    item?: Item,
-    itemId: number,
+interface ScrobblesGroupedByTimestampGroupedByTrackableId {
+    trackable?: Trackable,
+    trackableId: number,
     scrobblesGroupedByTimestamp: ScrobblesGroupedByTimestamp[],
 }
 
-const groupScrobblesByItems = (scrobbles: Scrobble[], items: Item[]): ItemGroup[] => {
+const groupScrobblesByTrackables = (scrobbles: Scrobble[], trackables: Trackable[]): ScrobbleGroup[] => {
     // Create the groups to be populated.
-    let itemGroups: ItemGroup[] = scrobbles
-        .map(x => x.drink_id)
+    let scrobbleGroups: ScrobbleGroup[] = scrobbles
+        .map(x => x.trackable_id)
         .filter(onlyUnique)
         .map(x => {
-            let itemGroup: ItemGroup = {
-                itemId: x,
+            let scrobbleGroup: ScrobbleGroup = {
+                trackableId: x,
                 scrobbles: [],
             }
 
-            return itemGroup
+            return scrobbleGroup
         })
 
     // Populate the groups with scrobbles.
-    for (let drinkDrank of scrobbles) {
-        let itemGroup = itemGroups.find(drinkGroup => drinkGroup.itemId == drinkDrank.drink_id)
+    for (let scrobble of scrobbles) {
+        let scrobbleGroup = scrobbleGroups.find(scrobbleGroup => scrobbleGroup.trackableId == scrobble.trackable_id)
 
-        itemGroup.scrobbles.push(drinkDrank)
+        scrobbleGroup.scrobbles.push(scrobble)
     }
 
-    // Sort the items in number order of the item IDs.
-    itemGroups = itemGroups
-        .sort((drinkGroupA, drinkGroupB) => drinkGroupA.itemId - drinkGroupB.itemId)
+    // Sort the trackables in number order of the trackable IDs.
+    scrobbleGroups = scrobbleGroups
+        .sort((a, b) => a.trackableId - b.trackableId)
 
-    return itemGroups
+    return scrobbleGroups
 }
 
-const groupScrobblesByTimeStampAndItemId = (scrobbles: Scrobble[], items: Item[], roundTo: luxon.DurationUnit): ScrobblesGroupedByTimestampGroupedByItemId[] => {
-    const itemGroups = groupScrobblesByItems(scrobbles, items)
+const groupScrobblesByTimeStampAndTrackableId = (scrobbles: Scrobble[], trackables: Trackable[], roundTo: luxon.DurationUnit): ScrobblesGroupedByTimestampGroupedByTrackableId[] => {
+    const scrobbleGroups = groupScrobblesByTrackables(scrobbles, trackables)
 
-    let scrobblesGroupedByTimestampGroupedByItemId: ScrobblesGroupedByTimestampGroupedByItemId[] = []
+    let scrobblesGroupedByTimestampGroupedByTrackableId: ScrobblesGroupedByTimestampGroupedByTrackableId[] = []
 
-    for (let itemGroup of itemGroups) {
-        let group: ScrobblesGroupedByTimestampGroupedByItemId = {
-            item: items.find(drink => drink.id == itemGroup.itemId),
-            itemId: itemGroup.itemId,
+    for (let scrobbleGroup of scrobbleGroups) {
+        let group: ScrobblesGroupedByTimestampGroupedByTrackableId = {
+            trackable: trackables.find(trackable => trackable.id == scrobbleGroup.trackableId),
+            trackableId: scrobbleGroup.trackableId,
             scrobblesGroupedByTimestamp: [],
         }
 
-        for (let scrobble of itemGroup.scrobbles
-            .sort((drinkDrankA, drinkDrankB) =>
-                drinkDrankA.scrobble_timestamp_datetime().diff(drinkDrankB.scrobble_timestamp_datetime()).milliseconds
+        for (let scrobble of scrobbleGroup.scrobbles
+            .sort((a, b) =>
+                a.scrobble_timestamp_datetime().diff(b.scrobble_timestamp_datetime()).milliseconds
             )
         ) {
             let byTimestamp = group.scrobblesGroupedByTimestamp
@@ -151,10 +151,10 @@ const groupScrobblesByTimeStampAndItemId = (scrobbles: Scrobble[], items: Item[]
             }
         }
 
-        scrobblesGroupedByTimestampGroupedByItemId.push(group)
+        scrobblesGroupedByTimestampGroupedByTrackableId.push(group)
     }
 
-    return scrobblesGroupedByTimestampGroupedByItemId
+    return scrobblesGroupedByTimestampGroupedByTrackableId
 }
 
 export class HourlyScrobblesChart extends React.Component {
@@ -165,18 +165,18 @@ export class HourlyScrobblesChart extends React.Component {
         const scrobbles = await api.listScrobbles({
             from: luxon.DateTime.local().plus({ day: -3}),
         })
-        const items = await api.listItems()
+        const trackables = await api.listTrackables()
 
-        const scrobblesGroupedByTimestampGroupedByDrinkId = groupScrobblesByTimeStampAndItemId(scrobbles, items, 'hour')
+        const scrobblesGroupedByTimestampGroupedByTrackableId = groupScrobblesByTimeStampAndTrackableId(scrobbles, trackables, 'hour')
 
         new ChartJs.Chart(ctx, {
             type: 'bar',
             data: {
-                datasets: scrobblesGroupedByTimestampGroupedByDrinkId.map(group => {
+                datasets: scrobblesGroupedByTimestampGroupedByTrackableId.map(group => {
                     return {
-                        label: group.item?.name ?? group.itemId.toString(),
-                        backgroundColor: group.item?.colour,
-                        stack: group.itemId.toString(),
+                        label: group.trackable?.name ?? group.trackableId.toString(),
+                        backgroundColor: group.trackable?.colour,
+                        stack: group.trackableId.toString(),
                         data: group.scrobblesGroupedByTimestamp.map(byTimestamp => {
                             return {
                                 x: byTimestamp.timestamp.toString(),
@@ -236,18 +236,18 @@ export class DailyScrobblesChart extends React.Component {
         const scrobbles = await api.listScrobbles({
             from: luxon.DateTime.local().plus({ month: -1 }),
         })
-        const drinks = await api.listItems()
+        const trackables = await api.listTrackables()
 
-        const scrobblesGroupedByTimestampGroupedByDrinkId = groupScrobblesByTimeStampAndItemId(scrobbles, drinks, 'day')
+        const scrobblesGroupedByTimestampGroupedByTrackableId = groupScrobblesByTimeStampAndTrackableId(scrobbles, trackables, 'day')
 
         new ChartJs.Chart(ctx, {
             type: 'bar',
             data: {
-                datasets: scrobblesGroupedByTimestampGroupedByDrinkId.map(group => {
+                datasets: scrobblesGroupedByTimestampGroupedByTrackableId.map(group => {
                     return {
-                        label: group.item?.name ?? group.itemId.toString(),
-                        backgroundColor: group.item?.colour,
-                        stack: group.itemId.toString(),
+                        label: group.trackable?.name ?? group.trackableId.toString(),
+                        backgroundColor: group.trackable?.colour,
+                        stack: group.trackableId.toString(),
                         data: group.scrobblesGroupedByTimestamp.map(byTimestamp => {
                             return {
                                 x: byTimestamp.timestamp.toString(),

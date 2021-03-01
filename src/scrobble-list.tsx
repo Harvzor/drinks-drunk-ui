@@ -1,7 +1,7 @@
 import React from 'react';
 import * as luxon from "luxon"
 
-import { Api, Item, Scrobble } from "./api"
+import { Api, Trackable, Scrobble } from "./api"
 
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -16,26 +16,26 @@ import Skeleton from '@material-ui/lab/Skeleton';
 
 class ScrobbleListState {
     loading: boolean
-    items: Item[]
+    trackables: Trackable[]
     scrobbles: Scrobble[]
 }
 
 export class ScrobbleList extends React.Component {
     state: ScrobbleListState = {
         loading: true,
-        items: [],
+        trackables: [],
         scrobbles: [],
     }
     async setup() {
         const api  = new Api()
         
-        const items = await api.listItems()
+        const trackables = await api.listTrackables()
         const scrobbles = (await api.listScrobbles({
                 take: 10,
             }))
-            .sort((itemA, itemB) => itemB.scrobble_timestamp_datetime().diff(itemA.scrobble_timestamp_datetime()).milliseconds)
+            .sort((a, b) => b.scrobble_timestamp_datetime().diff(a.scrobble_timestamp_datetime()).milliseconds)
 
-        this.setState({ loading: false, items, scrobbles, })
+        this.setState({ loading: false, trackables: trackables, scrobbles, })
     }
     componentDidMount() {
         this.setup()
@@ -64,8 +64,8 @@ export class ScrobbleList extends React.Component {
                                             {this.state.scrobbles.map((scrobble: Scrobble) => (
                                                 <TableRow key={scrobble.id}>
                                                     <TableCell component="th" scope="row">
-                                                        <span style={{ color: this.state.items.find(item => item.id === scrobble.drink_id)?.colour ?? 'inherit' }}>
-                                                            { this.state.items.find(item => item.id === scrobble.drink_id)?.name ?? scrobble.drink_id }
+                                                        <span style={{ color: this.state.trackables.find(trackable => trackable.id === scrobble.trackable_id)?.colour ?? 'inherit' }}>
+                                                            { this.state.trackables.find(trackable => trackable.id === scrobble.trackable_id)?.name ?? scrobble.trackable_id }
                                                         </span>
                                                     </TableCell>
                                                     <TableCell align="right">

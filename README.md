@@ -1,4 +1,4 @@
-# Drinks Drunk UI
+# Scrobbler UI
 
 ## Requirements
 

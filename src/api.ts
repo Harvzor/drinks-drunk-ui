@@ -2,28 +2,28 @@ import * as luxon from "luxon"
 
 export class ScrobbleDto {
     id: number
-    drink_id: number
-    drank_timestamp: string
+    trackable_id: number
+    timestamp: string
 }
 
 export class Scrobble extends ScrobbleDto {
-    static fromItemDto(dto: ScrobbleDto) {
+    static fromDto(dto: ScrobbleDto) {
         let scrobble = new Scrobble()
         
         scrobble.id = dto.id
-        scrobble.drink_id = dto.drink_id
-        scrobble.drank_timestamp = dto.drank_timestamp
+        scrobble.trackable_id = dto.trackable_id
+        scrobble.timestamp = dto.timestamp
 
         return scrobble
     }
     scrobble_timestamp_datetime() {
         return luxon.DateTime
             // API should return the time in UTC0.
-            .fromISO(this.drank_timestamp, { zone: "utc" })
+            .fromISO(this.timestamp, { zone: "utc" })
     }
 }
 
-export interface Item {
+export interface Trackable {
     id: number
     name: string
     count: number
@@ -32,7 +32,7 @@ export interface Item {
 }
 
 export interface ListScrobblesOptions {
-    itemId?: number
+    trackableId?: number
     skip?: number
     take?: number
     from?: luxon.DateTime
@@ -55,8 +55,8 @@ export class Api {
             console.error(reason)
         })
     }
-    async listItems(): Promise<Item[]> {
-        const drinks: Item[] = await fetch(this._domain + "/drinks", {
+    async listTrackables(): Promise<Trackable[]> {
+        const trackables: Trackable[] = await fetch(this._domain + "/trackables", {
             mode: 'cors'
         })
         .then(res => res.json())
@@ -64,10 +64,10 @@ export class Api {
             console.error(reason)
         })
 
-        return drinks
+        return trackables
     }
     async listScrobbles(options?: ListScrobblesOptions): Promise<Scrobble[]> {
-        const url = new URL(this._domain + "/drink_dranks")
+        const url = new URL(this._domain + "/scrobbles")
 
         let params: any = {}
 
@@ -85,7 +85,7 @@ export class Api {
 
         url.search = new URLSearchParams(params).toString()
 
-        const drinkDrankDtos: ScrobbleDto[] = await fetch(url.toString(), {
+        const scrobbleDtos: ScrobbleDto[] = await fetch(url.toString(), {
             mode: 'cors',
         })
         .then(res => res.json())
@@ -93,22 +93,22 @@ export class Api {
             console.error(reason)
         })
 
-        return drinkDrankDtos
-            .map(dto => Scrobble.fromItemDto(dto))
+        return scrobbleDtos
+            .map(dto => Scrobble.fromDto(dto))
     }
-    async incrementItem(itemId: number): Promise<Scrobble> {
-        const itemDto: ScrobbleDto = await this.post('/drink_drank', {
-            drink_id: itemId,
+    async incrementTrackable(trackableId: number): Promise<Scrobble> {
+        const scrobbleDto: ScrobbleDto = await this.post('/scrobble', {
+            trackable_id: trackableId,
         })
 
-        return Scrobble.fromItemDto(itemDto)
+        return Scrobble.fromDto(scrobbleDto)
     }
-    async createItem(name: string, colour: string): Promise<Item> {
-        const item: Item = await this.post('/drinks', {
+    async createTrackable(name: string, colour: string): Promise<Trackable> {
+        const trackable: Trackable = await this.post('/trackables', {
             name: name,
             colour: colour,
         })
 
-        return item
+        return trackable
     }
 }

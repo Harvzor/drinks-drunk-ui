@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Api, Item } from "./api"
+import { Api, Trackable } from "./api"
 
 import Grid from '@material-ui/core/Grid';
 import Card from '@material-ui/core/Card';
@@ -10,26 +10,26 @@ import Typography from '@material-ui/core/Typography';
 import Skeleton from '@material-ui/lab/Skeleton';
 
 class ScrobbleSummaryState {
-    items: Item[]
+    trackables: Trackable[]
     sum: number
-    mostPopularItem: Item
+    mostPopularTrackable: Trackable
 }
 
 export class ScrobbleSummary extends React.Component {
     state: ScrobbleSummaryState = {
-        items: null,
+        trackables: null,
         sum: null,
-        mostPopularItem: null,
+        mostPopularTrackable: null,
     }
     async setup() {
         const api  = new Api()
         
-        const items = await api.listItems()
+        const trackables = await api.listTrackables()
 
-        const sum = items.reduce((s, item) => s + item.count, 0)
-        const mostPopularItem = items.sort((a, b) => a.count - b.count)[0]
+        const sum = trackables.reduce((s, trackable) => s + trackable.count, 0)
+        const mostPopularTrackable = trackables.sort((a, b) => a.count - b.count)[0]
 
-        this.setState({ items, sum, mostPopularItem, })
+        this.setState({ trackables: trackables, sum, mostPopularTrackable: mostPopularTrackable, })
     }
     componentDidMount() {
         this.setup()
@@ -59,12 +59,12 @@ export class ScrobbleSummary extends React.Component {
                     <Card>
                         <CardContent>
                             <Typography color="textSecondary" gutterBottom>
-                                Most popular item
+                                Most popular trackable
                             </Typography>
-                            {this.state.mostPopularItem 
+                            {this.state.mostPopularTrackable 
                                 ? <Typography variant="h5" component="h2">
-                                    <span style={{ color: this.state.mostPopularItem?.colour ?? 'inherit' }}>
-                                        {this.state.mostPopularItem.name}
+                                    <span style={{ color: this.state.mostPopularTrackable?.colour ?? 'inherit' }}>
+                                        {this.state.mostPopularTrackable.name}
                                     </span>
                                 </Typography>
                                 : <Skeleton />
@@ -72,7 +72,7 @@ export class ScrobbleSummary extends React.Component {
                         </CardContent>
                     </Card>
                 </Grid>
-                {this.renderSummary('Total active items', this.state.items?.length)}
+                {this.renderSummary('Total active trackables', this.state.trackables?.length)}
             </Grid>
         )
     }

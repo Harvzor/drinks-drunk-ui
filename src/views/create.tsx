@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Api, Item } from "../api"
+import { Api, Trackable } from "../api"
 
 import { withStyles, WithStyles, createStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
@@ -38,9 +38,9 @@ const useStyles = theme => createStyles({
 
 class CreateState {
     loading: boolean
-    items: Item[]
-    itemName: string
-    itemColour: string
+    trackables: Trackable[]
+    trackableName: string
+    trackableColour: string
     createModalOpen: boolean
 }
 
@@ -49,16 +49,16 @@ interface Props extends WithStyles<typeof useStyles>{ }
 class Create extends React.Component<Props> {
     state: CreateState = {
         loading: true,
-        items: [],
-        itemName: '',
-        itemColour: '',
+        trackables: [],
+        trackableName: '',
+        trackableColour: '',
         createModalOpen: false,
     }
     api = new Api()
-    loadAndRenderItems() {
-        this.api.listItems()
-            .then((returnedItems) => {
-                this.setState({ items: returnedItems, loading: false })
+    loadAndRenderTrackables() {
+        this.api.listTrackables()
+            .then((returnedTrackables) => {
+                this.setState({ trackables: returnedTrackables, loading: false })
             })
     }
     handleSubmit = (e: React.FormEvent) => {
@@ -68,14 +68,14 @@ class Create extends React.Component<Props> {
 
         this.setState({ loading: true })
 
-        this.api.createItem(this.state.itemName, this.state.itemColour)
+        this.api.createTrackable(this.state.trackableName, this.state.trackableColour)
             .then(() => {
                 this.setState({ createModalOpen: false })
-                this.loadAndRenderItems()
+                this.loadAndRenderTrackables()
             })
     }
     componentDidMount() {
-        this.loadAndRenderItems()
+        this.loadAndRenderTrackables()
     }
     render() {
         const { classes } = this.props;
@@ -110,16 +110,16 @@ class Create extends React.Component<Props> {
                                     )}
                                 </>
                                 : <>
-                                    {this.state.items.map((item: Item) => (
-                                        <TableRow key={item.id}>
+                                    {this.state.trackables.map((trackable: Trackable) => (
+                                        <TableRow key={trackable.id}>
                                             <TableCell component="th">
-                                                <span style={{ color: item.colour }}>
-                                                    { item.name }
+                                                <span style={{ color: trackable.colour }}>
+                                                    { trackable.name }
                                                 </span>
                                             </TableCell>
                                             <TableCell>
                                                 <span>
-                                                    { item.colour }
+                                                    { trackable.colour }
                                                 </span>
                                             </TableCell>
                                         </TableRow>
@@ -137,10 +137,10 @@ class Create extends React.Component<Props> {
                     <Paper className={classes.modal}>
                         <form className={classes.root} onSubmit={this.handleSubmit}>
                             <div>
-                                <TextField name="itemName" value={this.state.itemName} onChange={e => this.setState({ itemName: e.target.value })} label="Name" helperText="Give it helpful name so you know what you're tracking" variant="outlined" />
+                                <TextField name="itemName" value={this.state.trackableName} onChange={e => this.setState({ trackableName: e.target.value })} label="Name" helperText="Give it helpful name so you know what you're tracking" variant="outlined" />
                             </div>
                             <div>
-                                <TextField name="itemColour" value={this.state.itemColour} onChange={e => this.setState({ itemColour: e.target.value })} label="Colour" helperText="Give it a colour which matches what it is. E.g. eating vegetables might be brown, drinking orange juice could be orange. The colour value can be an HTML colour name, RGB or hex value." variant="outlined" />
+                                <TextField name="itemColour" value={this.state.trackableColour} onChange={e => this.setState({ trackableColour: e.target.value })} label="Colour" helperText="Give it a colour which matches what it is. E.g. eating vegetables might be brown, drinking orange juice could be orange. The colour value can be an HTML colour name, RGB or hex value." variant="outlined" />
                             </div>
                             <div>
                                 <Button variant="contained" color="primary" type="submit">

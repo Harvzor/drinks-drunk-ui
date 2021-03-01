@@ -3,7 +3,7 @@ import React from 'react';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 
-import { AllItemsChart, HourlyScrobblesChart, DailyScrobblesChart } from '../charts';
+import { AllTrackablesChart, HourlyScrobblesChart, DailyScrobblesChart } from '../charts';
 import { ScrobbleList } from '../scrobble-list';
 import { ScrobbleSummary } from '../scrobble-summary';
 
@@ -15,10 +15,10 @@ export class Home extends React.Component {
                 <ScrobbleSummary />
                 <h2>Recent</h2>
                 <ScrobbleList />
-                <h2>Top Items</h2>
+                <h2>Top Trackables</h2>
                 <Card>
                     <CardContent>
-                        <AllItemsChart/>
+                        <AllTrackablesChart/>
                     </CardContent>
                 </Card>
                 <h2>Hourly View of Scrobbles (last 3 days)</h2>
