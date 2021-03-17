@@ -40,7 +40,7 @@ export interface ListScrobblesOptions {
 }
 
 export class Api {
-    private _domain = 'http://localhost:8000'
+    private _domain = window._env_.API_URL
     private async post(path: string, body: object) {
         return await fetch(this._domain + path, {
             method: 'POST',

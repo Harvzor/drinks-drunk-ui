@@ -5,6 +5,8 @@ services:
   scrobbler-ui:
     build:
       context: .
+    environment:
+      API_URL: "http://192.168.1.37:8000/"
     ports:
       - 80:80
 
