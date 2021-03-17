@@ -1,0 +1,14 @@
+version: "3.4"
+
+services:
+
+  scrobbler-ui:
+    build:
+      context: .
+    ports:
+      - 80:80
+
+  scrobbler-ui-prod:
+    image: harvzor/scrobbler-ui:latest
+    ports:
+      - 80:80
