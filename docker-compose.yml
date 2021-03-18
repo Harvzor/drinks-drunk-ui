@@ -5,12 +5,12 @@ services:
   scrobbler-ui:
     build:
       context: .
-    environment:
-      API_URL: "http://192.168.1.37:8000/"
     ports:
       - 80:80
 
   scrobbler-ui-prod:
     image: harvzor/scrobbler-ui:latest
+    environment:
+      API_URL: "http://192.168.1.37:8000/"
     ports:
       - 80:80
